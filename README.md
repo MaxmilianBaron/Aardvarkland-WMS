@@ -92,16 +92,16 @@ Aardvarkland WMS staví provozní pravidla a stav systému do backendu. Produkt 
 
 ### Rozsah produktu
 
-Referenční metrika z 25. 5. 2026:
+Referenční metrika z 16. 7. 2026:
 
 | Rozsah | Soubory | Řádky |
 |---|---:|---:|
-| Backend — čistý produktový kód | 550 | 65 345 |
-| Backend — celkový aplikační rozsah | 596 | 71 951 |
-| Frontend — čistý produktový kód | 77 | 15 601 |
-| Frontend — celkový aplikační rozsah | 92 | 16 059 |
-| Celkem — čistý produktový kód | 627 | 80 946 |
-| Celkem — celkový aplikační rozsah | 688 | 88 010 |
+| Backend — čistý produktový kód | 553 | 65 750 |
+| Backend — celkový aplikační rozsah | 601 | 72 722 |
+| Frontend — čistý produktový kód | 80 | 15 947 |
+| Frontend — celkový aplikační rozsah | 95 | 16 461 |
+| Celkem — čistý produktový kód | 633 | 81 697 |
+| Celkem — celkový aplikační rozsah | 696 | 89 183 |
 
 Čistý produktový kód zahrnuje samotné zdrojové soubory produktu. Celkový aplikační rozsah navíc počítá testy, migrace, konfiguraci, skripty, příklady a lokální dokumentaci. Nezahrnuje dependencies, build výstupy, generovaný Prisma client, `backend/openapi.json`, lockfile, logy, generované reporty, binární assety, modely ani zálohy.
 
@@ -203,16 +203,16 @@ Aardvarkland WMS keeps operational rules and system state in the backend. The pr
 
 ### Product footprint
 
-Reference measurement from 2026-05-25:
+Reference measurement from 2026-07-16:
 
 | Scope | Files | Lines |
 |---|---:|---:|
-| Backend — clean product code | 550 | 65,345 |
-| Backend — total application scope | 596 | 71,951 |
-| Frontend — clean product code | 77 | 15,601 |
-| Frontend — total application scope | 92 | 16,059 |
-| Combined — clean product code | 627 | 80,946 |
-| Combined — total application scope | 688 | 88,010 |
+| Backend — clean product code | 553 | 65,750 |
+| Backend — total application scope | 601 | 72,722 |
+| Frontend — clean product code | 80 | 15,947 |
+| Frontend — total application scope | 95 | 16,461 |
+| Combined — clean product code | 633 | 81,697 |
+| Combined — total application scope | 696 | 89,183 |
 
 Clean product code counts the product source itself. Total application scope also includes tests, migrations, configuration, scripts, examples, and local documentation. It excludes dependencies, build output, the generated Prisma client, `backend/openapi.json`, lockfiles, logs, generated reports, binary assets, model files, and backup artifacts.
 
