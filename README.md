@@ -1,38 +1,73 @@
 # Aardvarkland WMS
 
-**Serverové řízení skladu pro týmy, provoz a administraci.**
+[English version](#english)
 
-[▶ Otevřít interaktivní preview](https://maxmilianbaron.github.io/Aardvarkland-WMS/)
+Skladový systém pro každodenní provoz, řízení práce a správu skladu
 
-Veřejné preview představuje hlavní obrazovky Aardvarkland WMS na izolovaných
-ukázkových datech. Není připojené k produkční databázi ani zákaznickému
-prostředí a neobsahuje privátní zdrojové kódy, hesla nebo provozní data.
+[Otevřít interaktivní preview](https://maxmilianbaron.github.io/Aardvarkland-WMS/)
 
-## Co systém pokrývá
+Preview umožňuje projít rozhraní Skladníka, Vedoucího skladu a Správce systému.
+Pracuje výhradně s ukázkovými daty a není napojené na žádné zákaznické prostředí.
 
-- příjem, zaskladnění, zásoby, rezervace a skladové pohyby,
-- RF úkoly, vychystávání, balení, expedici, vratky a inventury,
-- čárové kódy, ZPL štítky, tiskárny a lokální Print Agent,
-- audit, integrace, provozní monitoring a Control Tower,
-- role Skladník, Vedoucí skladu a Správce systému.
+## Hlavní oblasti
 
-Uživatele a jejich role vytváří pouze Správce systému. Může založit Skladníka,
-Vedoucího skladu i dalšího Správce. Vedoucí ani Skladník uživatele nevytvářejí.
-Přepínač rolí ve veřejném preview slouží pouze k prohlížení jednotlivých pohledů;
-v reálném systému oprávnění vynucuje backend.
+- příjem, zaskladnění, zásoby, rezervace a skladové pohyby
+- RF úkoly, vychystávání, balení, expedice, vratky a inventury
+- práce s čárovými kódy, ZPL štítky a tiskovými frontami
+- integrace, audit, provozní dohled a Control Tower
+- samostatné pracovní prostředí pro jednotlivé skladové role
+
+## Role a oprávnění
+
+Skladník má k dispozici provozní úkoly potřebné pro běžnou směnu. Vedoucí skladu
+řídí práci a sleduje stav provozu. Správce systému odpovídá za uživatele, role,
+sklady, integrace a technické nastavení.
+
+Nové uživatele může založit pouze Správce systému. Může vytvořit Skladníka,
+Vedoucího skladu i dalšího Správce. Přepínač rolí ve veřejném preview slouží
+jen k předvedení jednotlivých pohledů.
+
+## Veřejné preview
+
+Repozitář obsahuje oddělenou prezentační verzi produktu. Nejsou v něm zdrojové
+kódy produkčního systému, přihlašovací údaje, databázové zálohy ani zákaznická
+data.
 
 ---
 
 ## English
 
-**Server-based warehouse management for teams, operations, and administration.**
+Warehouse management software for daily operations, work coordination, and
+warehouse administration
 
-[▶ Open the interactive preview](https://maxmilianbaron.github.io/Aardvarkland-WMS/)
+[Open the interactive preview](https://maxmilianbaron.github.io/Aardvarkland-WMS/)
 
-The preview presents warehouse, RF, inventory, printing, Control Tower, and
-administration workflows using isolated sample data. Only system administrators
-can create users and assign Worker, Warehouse Manager, or System Administrator
-roles. The public repository contains no production source tree, credentials,
-customer data, or database dumps.
+The preview provides access to the Warehouse Worker, Warehouse Manager, and
+System Administrator interfaces. It uses sample data only and is not connected
+to any customer environment.
+
+## Main areas
+
+- receiving, putaway, inventory, reservations, and stock movements
+- RF tasks, picking, packing, shipping, returns, and stock counts
+- barcode workflows, ZPL labels, and print queues
+- integrations, audit, operational monitoring, and Control Tower
+- dedicated workspaces for each warehouse role
+
+## Roles and permissions
+
+Warehouse Workers handle the operational tasks required during a normal shift.
+Warehouse Managers coordinate work and monitor operations. System Administrators
+manage users, roles, warehouses, integrations, and technical configuration.
+
+Only a System Administrator can create users. Administrators can create a
+Warehouse Worker, Warehouse Manager, or another System Administrator. The role
+switcher in the public preview exists only to demonstrate each interface.
+
+## Public preview
+
+This repository contains a separate presentation build of the product. It does
+not include the production source code, credentials, database backups, or
+customer data.
 
 All rights reserved by Aardvarkland Inc.
