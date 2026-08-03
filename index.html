@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="cs">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta
+      name="description"
+      content="Aardvarkland WMS product preview for warehouse operations, RF scanning, labels, integrations, and role-based workflows."
+    >
+    <title>Aardvarkland WMS Product Preview</title>
+    <link rel="icon" href="assets/logo.png">
+    <link rel="stylesheet" href="styles.css?v=production-closure-20260525">
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Primary">
+        <a class="brand" href="#" aria-label="Aardvarkland WMS Product Preview">
+          <img src="assets/logo.png" alt="" class="brand-logo">
+          <span>
+            <strong>Aardvarkland</strong>
+            <span id="brand-subtitle">systém řízení skladu</span>
+          </span>
+        </a>
+
+        <div class="mode-group" aria-label="Role">
+          <button class="mode-button is-active" data-role="worker" type="button">Skladník</button>
+          <button class="mode-button" data-role="manager" type="button">Vedoucí</button>
+          <button class="mode-button" data-role="admin" type="button">Správce</button>
+        </div>
+
+        <nav class="nav-list" id="nav-list"></nav>
+      </aside>
+
+      <main class="workspace">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow" id="workspace-eyebrow">Hlavní sklad</p>
+            <h1 id="workspace-title">Operativní přehled</h1>
+          </div>
+          <div class="topbar-actions">
+            <div class="language-menu" aria-label="Vybrat jazyk">
+              <button class="language-switch" id="language-toggle" data-action="language-menu-toggle" type="button" aria-label="Vybrat jazyk" aria-expanded="false" aria-haspopup="menu" title="Vybrat jazyk">
+                <span class="flag-icon" id="current-language-flag" aria-hidden="true"></span>
+              </button>
+              <div class="language-menu__list" id="language-list" role="menu" aria-label="Vybrat jazyk" hidden>
+                <button class="language-menu__item is-active" data-lang="cs" type="button" role="menuitemradio" aria-checked="true" aria-label="Čeština" title="Čeština">
+                  <span class="flag-icon" data-flag="cs" aria-hidden="true"></span>
+                </button>
+                <button class="language-menu__item" data-lang="en" type="button" role="menuitemradio" aria-checked="false" aria-label="English" title="English">
+                  <span class="flag-icon" data-flag="en" aria-hidden="true"></span>
+                </button>
+                <button class="language-menu__item" data-lang="ua" type="button" role="menuitemradio" aria-checked="false" aria-label="Українська" title="Українська">
+                  <span class="flag-icon" data-flag="ua" aria-hidden="true"></span>
+                </button>
+              </div>
+            </div>
+            <button class="theme-toggle" id="theme-toggle" data-action="theme-toggle" type="button" aria-pressed="false" aria-label="Přepnout na tmavý režim" title="Přepnout na tmavý režim">
+              <span id="theme-toggle-icon" aria-hidden="true"></span>
+            </button>
+            <button class="icon-button" type="button" data-action="sync" aria-label="Obnovit stav" title="Obnovit stav">↻</button>
+          </div>
+        </header>
+
+        <section class="status-strip" aria-label="Stav skladu">
+          <div>
+            <span class="status-dot status-dot--ok"></span>
+            <span id="api-status">API připravené</span>
+          </div>
+          <div>
+            <span class="status-dot status-dot--warn"></span>
+            <span id="print-status">2 úlohy čekají na tisk</span>
+          </div>
+          <div>
+            <span class="status-dot status-dot--ok"></span>
+            <span id="scan-status">RF skenery aktivní</span>
+          </div>
+        </section>
+
+        <section class="view is-active" id="view-root"></section>
+      </main>
+    </div>
+
+    <script src="app.js?v=production-closure-20260525"></script>
+  </body>
+</html>
