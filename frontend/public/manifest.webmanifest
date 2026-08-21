@@ -1,0 +1,24 @@
+{
+  "name": "Aardvarkland",
+  "short_name": "Aardvarkland",
+  "description": "Aardvarkland skladové rozhraní pro RF terminály a pracovní stanice.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f5f5f7",
+  "theme_color": "#111827",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "assets/aardvarkland-icon-96.png",
+      "sizes": "96x96",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/aardvarkland-icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

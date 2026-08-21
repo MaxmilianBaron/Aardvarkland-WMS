@@ -1,71 +1,164 @@
 # Aardvarkland WMS
 
-[English version](#english)
+Open-source warehouse management system for inventory, receiving, picking, packing, shipping, barcode workflows, printing, and warehouse operations.
 
-Skladový systém pro každodenní provoz, řízení práce a správu skladu
+[Live Demo](https://maxmilianbaron.github.io/Aardvarkland-WMS/) · [Screenshots](#screenshots) · [Quick Start](#quick-start) · [Documentation](docs/) · [WMS Mini](https://github.com/MaxmilianBaron/Aardvarkland-WMS-Mini)
 
-[Otevřít interaktivní preview](https://maxmilianbaron.github.io/Aardvarkland-WMS/)
+![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)
 
-Preview umožňuje projít rozhraní Skladníka, Vedoucího skladu a Správce systému.
-Pracuje výhradně s ukázkovými daty a není napojené na žádné zákaznické prostředí.
+## Overview
 
-## Hlavní oblasti
+Aardvarkland WMS is a self-hosted, full-stack warehouse management platform. A React frontend supports warehouse workers, managers, and system administrators; a NestJS API and PostgreSQL database own inventory, permissions, workflows, integrations, audit data, and operational state.
 
-- příjem, zaskladnění, zásoby, rezervace a skladové pohyby
-- RF úkoly, vychystávání, balení, expedice, vratky a inventury
-- práce s čárovými kódy, ZPL štítky a tiskovými frontami
-- integrace, audit, provozní dohled a Control Tower
-- samostatné pracovní prostředí pro jednotlivé skladové role
+## Why this project?
 
-## Role a oprávnění
+- Keep receiving, putaway, picking, packing, shipping, and inventory in one system.
+- Support keyboard-wedge and camera barcode workflows plus RF-oriented screens.
+- Route ZPL print jobs through a local Print Agent instead of browser-only printing.
+- Run on your own infrastructure with explicit configuration and operational controls.
+- Inspect and extend the complete TypeScript source under the MIT License.
 
-Skladník má k dispozici provozní úkoly potřebné pro běžnou směnu. Vedoucí skladu
-řídí práci a sleduje stav provozu. Správce systému odpovídá za uživatele, role,
-sklady, integrace a technické nastavení.
+## Features
 
-Nové uživatele může založit pouze Správce systému. Může vytvořit Skladníka,
-Vedoucího skladu i dalšího Správce. Přepínač rolí ve veřejném preview slouží
-jen k předvedení jednotlivých pohledů.
+- Product, warehouse, location, inventory, reservation, and cycle-count management
+- Inbound receiving and putaway workflows
+- Outbound allocation, wave picking, packing, parcels, and shipping
+- Role-based access for workers, warehouse managers, and system administrators
+- Barcode resolution, scanner telemetry, label templates, and ZPL print queues
+- Control Tower, analytics, incidents, alerts, readiness, and audit exports
+- Czech, English, Ukrainian, French, German, and Spanish interfaces
+- Docker-based local stack and Windows operational scripts
 
-## Veřejné preview
+## Screenshots
 
-Repozitář obsahuje oddělenou prezentační verzi produktu. Nejsou v něm zdrojové
-kódy produkčního systému, přihlašovací údaje, databázové zálohy ani zákaznická
-data.
+The live demo uses safe sample data and does not connect to a production backend.
 
----
+| Dashboard and role workflow | Mobile warehouse view |
+| --- | --- |
+| ![Aardvarkland WMS dashboard](docs/images/wms-dashboard.png) | ![Aardvarkland WMS mobile view](docs/images/wms-mobile.png) |
 
-## English
+## Live Demo
 
-Warehouse management software for daily operations, work coordination, and
-warehouse administration
+Try the interactive product preview at [maxmilianbaron.github.io/Aardvarkland-WMS](https://maxmilianbaron.github.io/Aardvarkland-WMS/). It demonstrates the interface with browser-only sample data; the source in this repository is the full application.
 
-[Open the interactive preview](https://maxmilianbaron.github.io/Aardvarkland-WMS/)
+## Quick Start
 
-The preview provides access to the Warehouse Worker, Warehouse Manager, and
-System Administrator interfaces. It uses sample data only and is not connected
-to any customer environment.
+Prerequisites: Docker Desktop with Compose, or Node.js 24.15+ and PostgreSQL 18.
 
-## Main areas
+```bash
+git clone https://github.com/MaxmilianBaron/Aardvarkland-WMS.git
+cd Aardvarkland-WMS
+docker compose up --build
+```
 
-- receiving, putaway, inventory, reservations, and stock movements
-- RF tasks, picking, packing, shipping, returns, and stock counts
-- barcode workflows, ZPL labels, and print queues
-- integrations, audit, operational monitoring, and Control Tower
-- dedicated workspaces for each warehouse role
+Open the frontend at `http://localhost:4000`. The API is available at `http://localhost:4001/api`.
 
-## Roles and permissions
+## Installation
 
-Warehouse Workers handle the operational tasks required during a normal shift.
-Warehouse Managers coordinate work and monitor operations. System Administrators
-manage users, roles, warehouses, integrations, and technical configuration.
+For a native development setup:
 
-Only a System Administrator can create users. Administrators can create a
-Warehouse Worker, Warehouse Manager, or another System Administrator. The role
-switcher in the public preview exists only to demonstrate each interface.
+```bash
+cd backend
+npm ci
+npm run prisma:generate
+cd ../frontend
+npm ci
+```
 
-## Public preview
+Copy `backend/.env.example` to `backend/.env` for local development and replace every placeholder before using a shared or production environment. Never commit the resulting `.env` file.
 
-This repository contains a separate presentation build of the product. It does
-not include the production source code, credentials, database backups, or
-customer data.
+## Configuration
+
+Runtime options are documented in [`backend/.env.example`](backend/.env.example) and [`backend/.env.production.example`](backend/.env.production.example). The local Compose defaults are deliberately development-only. Generate unique database, JWT, MFA, webhook, and administrator secrets for every deployment.
+
+## Development
+
+```bash
+# terminal 1
+cd backend
+npm run start:dev
+
+# terminal 2
+cd frontend
+npm run dev
+```
+
+The frontend defaults to port `4000`; the API defaults to port `4001` with the `/api` prefix.
+
+## Testing
+
+```bash
+cd backend
+npm run verify
+
+cd ../frontend
+npm run typecheck
+npm run lint
+npm test
+npm run build
+
+cd ../print-agent
+npm ci
+npm run check
+```
+
+Hardware simulators and role journeys live in `MCP/`. Software simulation does not replace acceptance testing with real scanners and printers.
+
+## Building
+
+```bash
+cd backend && npm run build
+cd ../frontend && npm run build
+```
+
+For the full containerized stack, run `docker compose build`.
+
+## Architecture
+
+```mermaid
+flowchart LR
+  UI[React frontend] --> API[NestJS API]
+  API --> DB[(PostgreSQL)]
+  API --> OUT[Integrations and outbox]
+  API --> JOBS[Print queue]
+  JOBS --> AGENT[Local Print Agent]
+  AGENT --> ZPL[ZPL printer]
+  SCAN[Barcode / RF devices] --> UI
+```
+
+The backend is the source of truth for permissions, inventory, workflows, audit data, and print jobs. See [`docs/`](docs/) for operational details.
+
+## Project Structure
+
+- `backend/` — NestJS API, Prisma schema, migrations, tests, and OpenAPI export
+- `frontend/` — React/Vite application and PWA shell
+- `print-agent/` — local ZPL printer bridge
+- `MCP/` — repeatable role, workflow, and hardware simulations
+- `scripts/`, `service/` — deployment, backup, acceptance, and Windows service tooling
+- `demo/` — independent GitHub Pages product preview
+- `docs/` — architecture, operations, reliability, and deployment documentation
+
+## Roadmap
+
+- Complete independent security and production-readiness review
+- Expand hardware acceptance across supported scanner and printer models
+- Add more deployment examples and observability integrations
+- Improve contributor-facing examples and end-to-end test coverage
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for setup, testing, and pull-request guidance.
+
+## Security
+
+Please report vulnerabilities privately as described in [SECURITY.md](SECURITY.md).
+
+## Related Projects
+
+Looking for a smaller, one-device implementation? See [Aardvarkland WMS Mini](https://github.com/MaxmilianBaron/Aardvarkland-WMS-Mini). For cash counting and till closing, see [Aardvarkland CashTally](https://github.com/MaxmilianBaron/Aardvarkland-CashTally).
+
+## License
+
+Licensed under the [MIT License](LICENSE).
+
+If you find this project useful, consider giving it a star — it helps others discover the project.

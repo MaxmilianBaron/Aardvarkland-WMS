@@ -1,0 +1,126 @@
+services:
+  postgres:
+    image: postgres:18-alpine
+    container_name: aardvarkland-storage-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: aardvarkland
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-aardvarkland}
+      POSTGRES_DB: aardvarkland_storage
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - aardvarkland-storage-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aardvarkland -d aardvarkland_storage"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+    container_name: aardvarkland-storage-backend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      PORT: 4001
+      DATABASE_URL: postgresql://aardvarkland:${POSTGRES_PASSWORD:-aardvarkland}@postgres:5432/aardvarkland_storage?schema=public
+      DATABASE_POOL_MAX: 20
+      REQUEST_BODY_LIMIT: 1mb
+      JWT_SECRET: ${JWT_SECRET:-local-storage-system-secret-at-least-32-chars}
+      JWT_ISSUER: aardvarkland-storage-system
+      JWT_AUDIENCE: aardvarkland-storage-system-api
+      WEBHOOK_SHARED_SECRET: ${WEBHOOK_SHARED_SECRET:-local-webhook-secret-at-least-32-chars}
+      WEBHOOK_SIGNATURE_TOLERANCE_SECONDS: 300
+      CARRIER_CREDENTIAL_ENCRYPTION_KEY: ${CARRIER_CREDENTIAL_ENCRYPTION_KEY:-local-carrier-credential-key-32chars}
+      CARRIER_ADAPTER_MODE: ${CARRIER_ADAPTER_MODE:-mock}
+      MFA_TOTP_ISSUER: Aardvarkland Storage System
+      MFA_SECRET_ENCRYPTION_KEY: ${MFA_SECRET_ENCRYPTION_KEY:-local-mfa-secret-key-at-least-32chars}
+      MFA_SECRET_ENCRYPTION_KEY_ID: storage-system-mfa-v1
+      CORS_ALLOWED_ORIGINS: http://localhost:4000
+      ENABLE_SWAGGER: "false"
+      ENABLE_DEMO_ROUTES: "false"
+      RATE_LIMIT_BACKEND: postgres
+      RATE_LIMIT_FAIL_OPEN: "false"
+      HEALTH_OUTBOX_MAX_AGE_SECONDS: 300
+      HEALTH_QUEUE_WORKER_MAX_AGE_SECONDS: 300
+      HEALTH_REQUIRE_QUEUE_WORKER: ${HEALTH_REQUIRE_QUEUE_WORKER:-false}
+      EXTERNAL_HTTP_ALLOWED_HOSTS: ""
+      AUTH_FAILED_LOGIN_BACKOFF_ENABLED: ${AUTH_FAILED_LOGIN_BACKOFF_ENABLED:-false}
+    ports:
+      - "4001:4001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"fetch('http://127.0.0.1:4001/api/health/ready').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  queue-worker:
+    build:
+      context: ./backend
+    container_name: aardvarkland-storage-queue-worker
+    restart: unless-stopped
+    command: ["npm", "run", "start:queue"]
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      DATABASE_URL: postgresql://aardvarkland:${POSTGRES_PASSWORD:-aardvarkland}@postgres:5432/aardvarkland_storage?schema=public
+      DATABASE_POOL_MAX: 10
+      REQUEST_BODY_LIMIT: 1mb
+      JWT_SECRET: ${JWT_SECRET:-local-storage-system-secret-at-least-32-chars}
+      JWT_ISSUER: aardvarkland-storage-system
+      JWT_AUDIENCE: aardvarkland-storage-system-api
+      WEBHOOK_SHARED_SECRET: ${WEBHOOK_SHARED_SECRET:-local-webhook-secret-at-least-32-chars}
+      WEBHOOK_SIGNATURE_TOLERANCE_SECONDS: 300
+      CARRIER_CREDENTIAL_ENCRYPTION_KEY: ${CARRIER_CREDENTIAL_ENCRYPTION_KEY:-local-carrier-credential-key-32chars}
+      CARRIER_ADAPTER_MODE: ${CARRIER_ADAPTER_MODE:-mock}
+      MFA_TOTP_ISSUER: Aardvarkland Storage System
+      MFA_SECRET_ENCRYPTION_KEY: ${MFA_SECRET_ENCRYPTION_KEY:-local-mfa-secret-key-at-least-32chars}
+      MFA_SECRET_ENCRYPTION_KEY_ID: storage-system-mfa-v1
+      CORS_ALLOWED_ORIGINS: http://localhost:4000
+      ENABLE_SWAGGER: "false"
+      ENABLE_DEMO_ROUTES: "false"
+      RATE_LIMIT_BACKEND: postgres
+      RATE_LIMIT_FAIL_OPEN: "false"
+      HEALTH_OUTBOX_MAX_AGE_SECONDS: 300
+      HEALTH_QUEUE_WORKER_MAX_AGE_SECONDS: 300
+      HEALTH_REQUIRE_QUEUE_WORKER: "false"
+      EXTERNAL_HTTP_ALLOWED_HOSTS: ""
+      AUTH_FAILED_LOGIN_BACKOFF_ENABLED: ${AUTH_FAILED_LOGIN_BACKOFF_ENABLED:-false}
+      WMS_QUEUE_WORKER_ID: ${WMS_QUEUE_WORKER_ID:-compose-queue-worker}
+      WMS_QUEUE_WORKER_POLL_INTERVAL_MS: ${WMS_QUEUE_WORKER_POLL_INTERVAL_MS:-5000}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: aardvarkland-storage-frontend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      PORT: 4000
+      API_BASE_URL: http://localhost:4001/api
+      VITE_API_BASE_URL: http://localhost:4001/api
+      ENABLE_MOCKS: "false"
+      ENABLE_DEMO_MODE: "false"
+      DEFAULT_WAREHOUSE_ID: MAIN
+    ports:
+      - "4000:4000"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"fetch('http://127.0.0.1:4000/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+volumes:
+  aardvarkland-storage-postgres-data:

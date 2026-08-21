@@ -1,0 +1,30 @@
+{
+  "name": "hardware-labels-lite",
+  "description": "Hardware-free WMS test for scanner payloads, label preview and queued ZPL printing.",
+  "warehouseId": "MAIN",
+  "roles": ["skladnik", "vedouci", "spravce"],
+  "scannerPayloads": [
+    { "type": "AARD1:LOC", "value": "AARD1:LOC:MAIN:A-01-01", "terminator": "enter" },
+    { "type": "AARD1:SKU", "value": "AARD1:SKU:MAIN:ABC123", "terminator": "enter" },
+    { "type": "AARD1:HU", "value": "AARD1:HU:MAIN:HU0001", "terminator": "tab" },
+    { "type": "AARD1:PARCEL", "value": "AARD1:PARCEL:MAIN:P0001", "terminator": "enter" },
+    { "type": "AARD1:TASK", "value": "AARD1:TASK:MAIN:T0001", "terminator": "enter" },
+    { "type": "GS1", "value": "]C1010850123456789010LOT-1<GS>17260531", "terminator": "enter" },
+    { "type": "RAW", "value": "RAW-FALLBACK-001", "terminator": "enter" }
+  ],
+  "labelPrint": {
+    "templateReference": "CUSTOM",
+    "printerCode": "FAKE-9100",
+    "failoverFakePrinterPort": 19102,
+    "labelCode": "AARD1:LOC:MAIN:A-01-01",
+    "title": "A-01-01",
+    "subtitle": "Lokace MAIN"
+  },
+  "expectedChecks": [
+    "skladnik resolves scans through UI",
+    "vedouci sees print queue and can reprint",
+    "spravce can configure printer, print agent and template",
+    "fake TCP 9100 captures raw ZPL beginning with ^XA and ending with ^XZ",
+    "multi-printer retry/failover blocks the primary agent after reassignment and prints on the secondary fake printer"
+  ]
+}
