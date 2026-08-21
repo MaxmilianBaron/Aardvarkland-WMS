@@ -6,7 +6,8 @@ import { fileURLToPath } from 'node:url';
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(scriptDir, '..');
-const edgePath = process.env.EDGE_PATH || 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe';
+const programFilesX86 = process.env['ProgramFiles(x86)'];
+const edgePath = process.env.EDGE_PATH || (programFilesX86 ? join(programFilesX86, 'Microsoft', 'Edge', 'Application', 'msedge.exe') : 'msedge');
 const url = process.env.DEMO_URL || 'http://127.0.0.1:4173/';
 const port = Number(process.env.CDP_PORT || 9338);
 const profileDir = join(process.env.TEMP || repoRoot, `aardvarkland-demo-verify-${Date.now()}`);

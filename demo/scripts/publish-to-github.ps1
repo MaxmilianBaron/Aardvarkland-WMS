@@ -13,12 +13,7 @@ function Find-Gh {
     return $command.Source
   }
 
-  $localGh = Join-Path $env:LOCALAPPDATA "Programs\GitHub CLI\bin\gh.exe"
-  if (Test-Path -LiteralPath $localGh) {
-    return $localGh
-  }
-
-  throw "GitHub CLI was not found. Install it from https://cli.github.com/ and rerun this script."
+  throw "GitHub CLI was not found on PATH. Install it from https://cli.github.com/ and rerun this script."
 }
 
 $gh = Find-Gh

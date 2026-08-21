@@ -196,7 +196,7 @@ export function LoginPage({ onLogin }: { onLogin: () => void }) {
           )}
           {errorMessage && <div className="inline-banner inline-banner--warning" role="alert"><span>{errorMessage}</span></div>}
           <Button className="login-submit" tone="primary" size="lg" type="submit" disabled={loading}>{loading ? text.loading : mfaRequired ? text.verify : text.submit}</Button>
-          <p className="login-footer">© 2026 Aardvarkland Inc.</p>
+          <p className="login-footer">© 2026 Aardvarkland</p>
         </form>
       </section>
     </main>

@@ -92,7 +92,7 @@
         </label>
 
         <button class="login-submit button--primary" id="demo-login-submit" type="submit">Sign in</button>
-        <p class="login-footer">© 2026 Aardvarkland Inc.</p>
+        <p class="login-footer">© 2026 Aardvarkland</p>
       </form>
     </section>`;
 
