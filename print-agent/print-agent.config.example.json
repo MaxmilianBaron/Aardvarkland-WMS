@@ -1,0 +1,25 @@
+{
+  "backendUrl": "http://localhost:4001/api",
+  "warehouseId": "MAIN",
+  "agentCode": "PACK-PC-01",
+  "token": "replace-with-generated-token-32-plus-chars",
+  "intervalMs": 2500,
+  "limit": 1,
+  "defaultPrinterCode": "PACK-01",
+  "printers": {
+    "PACK-01": {
+      "mode": "TCP_9100",
+      "host": "192.168.1.50",
+      "port": 9100
+    },
+    "FAKE-9100": {
+      "mode": "TCP_9100",
+      "host": "127.0.0.1",
+      "port": 9100
+    },
+    "WINDOWS-ZEBRA": {
+      "mode": "WINDOWS_RAW",
+      "windowsPrinterName": "Zebra ZD421"
+    }
+  }
+}

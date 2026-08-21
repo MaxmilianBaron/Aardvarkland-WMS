@@ -1,0 +1,277 @@
+{
+  "scenarioId": "eshop-electro-shift-30m",
+  "name": "Realistická směna e-shop skladu s elektronikou",
+  "language": "cs",
+  "warehouse": {
+    "code": "MAIN",
+    "name": "Hlavní sklad",
+    "zones": ["IN", "A", "B", "RES", "PACK", "SHIP", "QA"]
+  },
+  "locations": [
+    { "code": "IN-01", "type": "receiving" },
+    { "code": "IN-02", "type": "receiving" },
+    { "code": "A-01-01", "type": "pick" },
+    { "code": "A-01-02", "type": "pick" },
+    { "code": "A-02-01", "type": "pick" },
+    { "code": "A-02-02", "type": "pick" },
+    { "code": "A-03-01", "type": "pick" },
+    { "code": "A-03-02", "type": "pick" },
+    { "code": "A-04-01", "type": "pick" },
+    { "code": "A-04-02", "type": "pick" },
+    { "code": "A-05-01", "type": "pick" },
+    { "code": "A-05-02", "type": "pick" },
+    { "code": "B-01-01", "type": "reserve" },
+    { "code": "B-01-02", "type": "reserve" },
+    { "code": "B-02-01", "type": "reserve" },
+    { "code": "B-02-02", "type": "reserve" },
+    { "code": "B-03-01", "type": "reserve" },
+    { "code": "B-03-02", "type": "reserve" },
+    { "code": "B-04-01", "type": "reserve" },
+    { "code": "B-04-02", "type": "reserve" },
+    { "code": "B-05-01", "type": "reserve" },
+    { "code": "B-05-02", "type": "reserve" },
+    { "code": "PACK-01", "type": "packing" },
+    { "code": "PACK-02", "type": "packing" },
+    { "code": "SHIP-01", "type": "shipping" },
+    { "code": "QA-01", "type": "quality" }
+  ],
+  "products": [
+    { "sku": "USB-C-20W-WHT", "ean": "8590000100011", "name": "USB-C nabíječka 20 W bílá", "category": "Napájení", "unit": "ks", "defaultLocation": "A-01-01" },
+    { "sku": "USB-C-65W-BLK", "ean": "8590000100028", "name": "USB-C nabíječka 65 W černá", "category": "Napájení", "unit": "ks", "defaultLocation": "A-01-02" },
+    { "sku": "USB-C-100W-GAN", "ean": "8590000100035", "name": "GaN nabíječka 100 W", "category": "Napájení", "unit": "ks", "defaultLocation": "A-02-01" },
+    { "sku": "CABLE-C2C-1M", "ean": "8590000100042", "name": "USB-C kabel 1 m", "category": "Kabely", "unit": "ks", "defaultLocation": "A-02-02" },
+    { "sku": "CABLE-C2C-2M", "ean": "8590000100059", "name": "USB-C kabel 2 m", "category": "Kabely", "unit": "ks", "defaultLocation": "A-03-01" },
+    { "sku": "CABLE-LIGHT-1M", "ean": "8590000100066", "name": "Lightning kabel 1 m", "category": "Kabely", "unit": "ks", "defaultLocation": "A-03-02" },
+    { "sku": "POWERBANK-10K", "ean": "8590000100073", "name": "Powerbanka 10000 mAh", "category": "Napájení", "unit": "ks", "defaultLocation": "B-01-01" },
+    { "sku": "POWERBANK-20K", "ean": "8590000100080", "name": "Powerbanka 20000 mAh", "category": "Napájení", "unit": "ks", "defaultLocation": "B-01-02" },
+    { "sku": "GLASS-PHONE-15", "ean": "8590000100097", "name": "Tvrzené sklo Phone 15", "category": "Ochrana displeje", "unit": "ks", "defaultLocation": "A-04-01" },
+    { "sku": "GLASS-PHONE-16", "ean": "8590000100103", "name": "Tvrzené sklo Phone 16", "category": "Ochrana displeje", "unit": "ks", "defaultLocation": "A-04-02" },
+    { "sku": "CASE-PHONE-15-BLK", "ean": "8590000100110", "name": "Kryt Phone 15 černý", "category": "Pouzdra", "unit": "ks", "defaultLocation": "A-05-01" },
+    { "sku": "CASE-PHONE-16-CLR", "ean": "8590000100127", "name": "Kryt Phone 16 průhledný", "category": "Pouzdra", "unit": "ks", "defaultLocation": "A-05-02" },
+    { "sku": "SSD-NVME-1TB", "ean": "8590000100134", "name": "NVMe SSD 1 TB", "category": "Komponenty", "unit": "ks", "defaultLocation": "B-02-01" },
+    { "sku": "SSD-NVME-2TB", "ean": "8590000100141", "name": "NVMe SSD 2 TB", "category": "Komponenty", "unit": "ks", "defaultLocation": "B-02-02" },
+    { "sku": "RAM-DDR5-32GB", "ean": "8590000100158", "name": "DDR5 RAM 32 GB kit", "category": "Komponenty", "unit": "ks", "defaultLocation": "B-03-01" },
+    { "sku": "RAM-DDR5-64GB", "ean": "8590000100165", "name": "DDR5 RAM 64 GB kit", "category": "Komponenty", "unit": "ks", "defaultLocation": "B-03-02" },
+    { "sku": "MOUSE-WIRELESS-01", "ean": "8590000100172", "name": "Bezdrátová myš", "category": "Periferie", "unit": "ks", "defaultLocation": "A-01-01" },
+    { "sku": "KEYBOARD-MECH-CZ", "ean": "8590000100189", "name": "Mechanická klávesnice CZ", "category": "Periferie", "unit": "ks", "defaultLocation": "B-04-01" },
+    { "sku": "HEADSET-GAMING", "ean": "8590000100196", "name": "Herní headset", "category": "Periferie", "unit": "ks", "defaultLocation": "B-04-02" },
+    { "sku": "WEBCAM-FHD", "ean": "8590000100202", "name": "Webkamera Full HD", "category": "Periferie", "unit": "ks", "defaultLocation": "A-02-01" },
+    { "sku": "ROUTER-WIFI6", "ean": "8590000100219", "name": "Wi-Fi 6 router", "category": "Síť", "unit": "ks", "defaultLocation": "B-05-01" },
+    { "sku": "SWITCH-8P-GIGA", "ean": "8590000100226", "name": "Gigabit switch 8 portů", "category": "Síť", "unit": "ks", "defaultLocation": "B-05-02" },
+    { "sku": "SMARTPLUG-EU", "ean": "8590000100233", "name": "Chytrá zásuvka EU", "category": "Smart home", "unit": "ks", "defaultLocation": "A-03-01" },
+    { "sku": "SMARTBULB-E27", "ean": "8590000100240", "name": "Chytrá žárovka E27", "category": "Smart home", "unit": "ks", "defaultLocation": "A-03-02" },
+    { "sku": "LEDSTRIP-5M", "ean": "8590000100257", "name": "LED pásek 5 m", "category": "Smart home", "unit": "ks", "defaultLocation": "A-04-01" },
+    { "sku": "MONITOR-24-FHD", "ean": "8590000100264", "name": "Monitor 24 FHD", "category": "Monitory", "unit": "ks", "defaultLocation": "B-01-01" },
+    { "sku": "MONITOR-27-QHD", "ean": "8590000100271", "name": "Monitor 27 QHD", "category": "Monitory", "unit": "ks", "defaultLocation": "B-01-02" },
+    { "sku": "HUB-USBC-6IN1", "ean": "8590000100288", "name": "USB-C hub 6v1", "category": "Adaptéry", "unit": "ks", "defaultLocation": "A-05-01" },
+    { "sku": "HUB-USBC-10IN1", "ean": "8590000100295", "name": "USB-C dokovací stanice 10v1", "category": "Adaptéry", "unit": "ks", "defaultLocation": "B-02-01" },
+    { "sku": "CARD-MICROSD-128", "ean": "8590000100301", "name": "microSD karta 128 GB", "category": "Paměti", "unit": "ks", "defaultLocation": "A-01-02" },
+    { "sku": "CARD-MICROSD-256", "ean": "8590000100318", "name": "microSD karta 256 GB", "category": "Paměti", "unit": "ks", "defaultLocation": "A-02-02" },
+    { "sku": "FLASH-USB-64", "ean": "8590000100325", "name": "USB flash disk 64 GB", "category": "Paměti", "unit": "ks", "defaultLocation": "A-04-02" },
+    { "sku": "FLASH-USB-256", "ean": "8590000100332", "name": "USB flash disk 256 GB", "category": "Paměti", "unit": "ks", "defaultLocation": "A-05-02" },
+    { "sku": "LAPTOP-SLEEVE-14", "ean": "8590000100349", "name": "Pouzdro na notebook 14", "category": "Pouzdra", "unit": "ks", "defaultLocation": "A-01-01" },
+    { "sku": "LAPTOP-SLEEVE-16", "ean": "8590000100356", "name": "Pouzdro na notebook 16", "category": "Pouzdra", "unit": "ks", "defaultLocation": "A-02-01" },
+    { "sku": "HDMI-2M", "ean": "8590000100363", "name": "HDMI kabel 2 m", "category": "Kabely", "unit": "ks", "defaultLocation": "A-03-01" },
+    { "sku": "DP-2M", "ean": "8590000100370", "name": "DisplayPort kabel 2 m", "category": "Kabely", "unit": "ks", "defaultLocation": "A-03-02" },
+    { "sku": "PHONE-STAND-ALU", "ean": "8590000100387", "name": "Hliníkový stojánek na telefon", "category": "Příslušenství", "unit": "ks", "defaultLocation": "A-04-01" },
+    { "sku": "NOTEBOOK-STAND", "ean": "8590000100394", "name": "Stojan na notebook", "category": "Příslušenství", "unit": "ks", "defaultLocation": "B-03-01" },
+    { "sku": "THERMAL-PASTE", "ean": "8590000100400", "name": "Teplovodivá pasta", "category": "Servis", "unit": "ks", "defaultLocation": "A-05-01" },
+    { "sku": "AIR-DUSTER", "ean": "8590000100417", "name": "Stlačený vzduch", "category": "Servis", "unit": "ks", "defaultLocation": "B-03-02" },
+    { "sku": "UPS-850VA", "ean": "8590000100424", "name": "UPS 850 VA", "category": "Napájení", "unit": "ks", "defaultLocation": "B-04-01" },
+    { "sku": "NAS-2BAY", "ean": "8590000100431", "name": "NAS 2 pozice", "category": "Síť", "unit": "ks", "defaultLocation": "B-04-02" },
+    { "sku": "CAM-IP-OUTDOOR", "ean": "8590000100448", "name": "Venkovní IP kamera", "category": "Kamery", "unit": "ks", "defaultLocation": "B-05-01" },
+    { "sku": "CAM-IP-INDOOR", "ean": "8590000100455", "name": "Vnitřní IP kamera", "category": "Kamery", "unit": "ks", "defaultLocation": "B-05-02" },
+    { "sku": "SENSOR-DOOR", "ean": "8590000100462", "name": "Dveřní senzor", "category": "Smart home", "unit": "ks", "defaultLocation": "A-01-02" },
+    { "sku": "SENSOR-MOTION", "ean": "8590000100479", "name": "Pohybový senzor", "category": "Smart home", "unit": "ks", "defaultLocation": "A-02-02" },
+    { "sku": "MIC-USB-PODCAST", "ean": "8590000100486", "name": "USB mikrofon", "category": "Audio", "unit": "ks", "defaultLocation": "B-02-02" },
+    { "sku": "SPEAKER-BT-MINI", "ean": "8590000100493", "name": "Bluetooth reproduktor mini", "category": "Audio", "unit": "ks", "defaultLocation": "A-04-02" },
+    { "sku": "EARBUDS-ANC", "ean": "8590000100509", "name": "Bezdrátová sluchátka ANC", "category": "Audio", "unit": "ks", "defaultLocation": "B-02-01" }
+  ],
+  "inboundShipments": [
+    {
+      "asn": "ASN-SHIFT-1001",
+      "supplier": "CZ Electro Supply",
+      "dock": "IN-01",
+      "lines": [
+        { "sku": "USB-C-65W-BLK", "quantity": 40 },
+        { "sku": "CABLE-C2C-1M", "quantity": 80 },
+        { "sku": "GLASS-PHONE-15", "quantity": 50 },
+        { "sku": "CASE-PHONE-15-BLK", "quantity": 40 }
+      ]
+    },
+    {
+      "asn": "ASN-SHIFT-1002",
+      "supplier": "EU Components",
+      "dock": "IN-02",
+      "lines": [
+        { "sku": "SSD-NVME-1TB", "quantity": 20 },
+        { "sku": "RAM-DDR5-32GB", "quantity": 16 },
+        { "sku": "ROUTER-WIFI6", "quantity": 18 },
+        { "sku": "HUB-USBC-10IN1", "quantity": 15 }
+      ]
+    },
+    {
+      "asn": "ASN-SHIFT-1003",
+      "supplier": "Smart Home Partner",
+      "dock": "IN-01",
+      "lines": [
+        { "sku": "SMARTPLUG-EU", "quantity": 60 },
+        { "sku": "SMARTBULB-E27", "quantity": 80 },
+        { "sku": "SENSOR-DOOR", "quantity": 40 },
+        { "sku": "SENSOR-MOTION", "quantity": 40 }
+      ]
+    }
+  ],
+  "outboundOrders": [
+    { "order": "SO-SHIFT-3001", "channel": "E-shop", "priority": "High", "lines": [{ "sku": "USB-C-65W-BLK", "quantity": 1 }, { "sku": "CABLE-C2C-1M", "quantity": 2 }] },
+    { "order": "SO-SHIFT-3002", "channel": "Marketplace", "priority": "Normal", "lines": [{ "sku": "POWERBANK-10K", "quantity": 1 }, { "sku": "GLASS-PHONE-15", "quantity": 1 }] },
+    { "order": "SO-SHIFT-3003", "channel": "E-shop", "priority": "High", "lines": [{ "sku": "SSD-NVME-1TB", "quantity": 1 }, { "sku": "RAM-DDR5-32GB", "quantity": 1 }] },
+    { "order": "SO-SHIFT-3004", "channel": "E-shop", "priority": "Normal", "lines": [{ "sku": "MOUSE-WIRELESS-01", "quantity": 1 }, { "sku": "KEYBOARD-MECH-CZ", "quantity": 1 }] },
+    { "order": "SO-SHIFT-3005", "channel": "B2C", "priority": "Normal", "lines": [{ "sku": "ROUTER-WIFI6", "quantity": 1 }, { "sku": "SWITCH-8P-GIGA", "quantity": 1 }] },
+    { "order": "SO-SHIFT-3006", "channel": "B2C", "priority": "High", "lines": [{ "sku": "SMARTPLUG-EU", "quantity": 3 }, { "sku": "SMARTBULB-E27", "quantity": 4 }] },
+    { "order": "SO-SHIFT-3007", "channel": "E-shop", "priority": "Normal", "lines": [{ "sku": "MONITOR-24-FHD", "quantity": 1 }, { "sku": "HDMI-2M", "quantity": 1 }] },
+    { "order": "SO-SHIFT-3008", "channel": "Marketplace", "priority": "Normal", "lines": [{ "sku": "HUB-USBC-6IN1", "quantity": 1 }, { "sku": "CARD-MICROSD-128", "quantity": 2 }] },
+    { "order": "SO-SHIFT-3009", "channel": "E-shop", "priority": "High", "lines": [{ "sku": "EARBUDS-ANC", "quantity": 1 }, { "sku": "SPEAKER-BT-MINI", "quantity": 1 }] },
+    { "order": "SO-SHIFT-3010", "channel": "B2B", "priority": "Normal", "lines": [{ "sku": "UPS-850VA", "quantity": 1 }, { "sku": "NAS-2BAY", "quantity": 1 }] },
+    { "order": "SO-SHIFT-3011", "channel": "E-shop", "priority": "Normal", "lines": [{ "sku": "CASE-PHONE-16-CLR", "quantity": 2 }, { "sku": "GLASS-PHONE-16", "quantity": 2 }] },
+    { "order": "SO-SHIFT-3012", "channel": "E-shop", "priority": "High", "lines": [{ "sku": "USB-C-100W-GAN", "quantity": 1 }, { "sku": "POWERBANK-20K", "quantity": 1 }] },
+    { "order": "SO-SHIFT-3013", "channel": "Marketplace", "priority": "Normal", "lines": [{ "sku": "CAM-IP-OUTDOOR", "quantity": 1 }, { "sku": "SENSOR-MOTION", "quantity": 2 }] },
+    { "order": "SO-SHIFT-3014", "channel": "B2C", "priority": "Normal", "lines": [{ "sku": "WEBCAM-FHD", "quantity": 1 }, { "sku": "MIC-USB-PODCAST", "quantity": 1 }] },
+    { "order": "SO-SHIFT-3015", "channel": "E-shop", "priority": "Normal", "lines": [{ "sku": "FLASH-USB-256", "quantity": 2 }, { "sku": "CARD-MICROSD-256", "quantity": 1 }] },
+    { "order": "SO-SHIFT-3016", "channel": "E-shop", "priority": "High", "lines": [{ "sku": "MONITOR-27-QHD", "quantity": 1 }, { "sku": "DP-2M", "quantity": 1 }] },
+    { "order": "SO-SHIFT-3017", "channel": "Marketplace", "priority": "Normal", "lines": [{ "sku": "NOTEBOOK-STAND", "quantity": 1 }, { "sku": "LAPTOP-SLEEVE-16", "quantity": 1 }] },
+    { "order": "SO-SHIFT-3018", "channel": "E-shop", "priority": "Normal", "lines": [{ "sku": "PHONE-STAND-ALU", "quantity": 1 }, { "sku": "CABLE-LIGHT-1M", "quantity": 1 }] },
+    { "order": "SO-SHIFT-3019", "channel": "B2C", "priority": "Normal", "lines": [{ "sku": "THERMAL-PASTE", "quantity": 2 }, { "sku": "AIR-DUSTER", "quantity": 1 }] },
+    { "order": "SO-SHIFT-3020", "channel": "E-shop", "priority": "High", "lines": [{ "sku": "CAM-IP-INDOOR", "quantity": 1 }, { "sku": "SENSOR-DOOR", "quantity": 2 }] },
+    { "order": "SO-SHIFT-3021", "channel": "E-shop", "priority": "Normal", "lines": [{ "sku": "USB-C-20W-WHT", "quantity": 2 }, { "sku": "CABLE-C2C-2M", "quantity": 2 }] },
+    { "order": "SO-SHIFT-3022", "channel": "Marketplace", "priority": "Normal", "lines": [{ "sku": "HEADSET-GAMING", "quantity": 1 }, { "sku": "MOUSE-WIRELESS-01", "quantity": 1 }] },
+    { "order": "SO-SHIFT-3023", "channel": "B2B", "priority": "Normal", "lines": [{ "sku": "SSD-NVME-2TB", "quantity": 1 }, { "sku": "RAM-DDR5-64GB", "quantity": 1 }] },
+    { "order": "SO-SHIFT-3024", "channel": "E-shop", "priority": "Normal", "lines": [{ "sku": "LAPTOP-SLEEVE-14", "quantity": 1 }, { "sku": "HUB-USBC-6IN1", "quantity": 1 }] },
+    { "order": "SO-SHIFT-3025", "channel": "E-shop", "priority": "High", "lines": [{ "sku": "SMARTPLUG-EU", "quantity": 2 }, { "sku": "LEDSTRIP-5M", "quantity": 1 }] },
+    { "order": "SO-SHIFT-3026", "channel": "B2C", "priority": "Normal", "lines": [{ "sku": "FLASH-USB-64", "quantity": 3 }, { "sku": "USB-C-20W-WHT", "quantity": 1 }] },
+    { "order": "SO-SHIFT-3027", "channel": "E-shop", "priority": "Normal", "lines": [{ "sku": "SMARTBULB-E27", "quantity": 3 }, { "sku": "SENSOR-DOOR", "quantity": 1 }] },
+    { "order": "SO-SHIFT-3028", "channel": "Marketplace", "priority": "Normal", "lines": [{ "sku": "EARBUDS-ANC", "quantity": 1 }, { "sku": "USB-C-65W-BLK", "quantity": 1 }] },
+    { "order": "SO-SHIFT-3029", "channel": "E-shop", "priority": "High", "lines": [{ "sku": "POWERBANK-20K", "quantity": 30 }, { "sku": "USB-C-100W-GAN", "quantity": 4 }] },
+    { "order": "SO-SHIFT-3030", "channel": "B2C", "priority": "Normal", "lines": [{ "sku": "CAM-IP-OUTDOOR", "quantity": 1 }, { "sku": "ROUTER-WIFI6", "quantity": 1 }] }
+  ],
+  "mcpShift": {
+    "durationMinutes": 30,
+    "workerCount": 10,
+    "warehouseCode": "MAIN",
+    "hardwareLab": {
+      "fakePrinterPort": 19101,
+      "failoverFakePrinterPort": 19102,
+      "renderMode": "offline",
+      "inShift": true,
+      "finalLab": false,
+      "multiPrinterFailover": true,
+      "printerCode": "MCP-SHIFT-PRINTER",
+      "agentCode": "MCP-SHIFT-AGENT",
+      "agentToken": "mcp-shift-agent-token-2026-local-secret",
+      "printPacingMs": 900
+    },
+    "readinessGates": {
+      "software30": {
+        "durationMinutes": 30,
+        "managerCount": 1,
+        "workerCount": 10,
+        "runMode": "persistent",
+        "runHardwareLab": true,
+        "runMultiPrinterFailover": true,
+        "screenshots": false,
+        "runUiAudit": false
+      },
+      "software60": {
+        "durationMinutes": 60,
+        "managerCount": 1,
+        "workerCount": 10,
+        "runMode": "persistent",
+        "runHardwareLab": true,
+        "runMultiPrinterFailover": true,
+        "screenshots": false,
+        "runUiAudit": false
+      }
+    },
+    "actionPacingMs": 700,
+    "actors": {
+      "manager": { "role": "vedouci", "loginName": "mcp-vedouci-shift@aardvarkland.local", "label": "Vedoucí směny MCP" },
+      "admin": { "role": "spravce", "loginName": "mcp-spravce@aardvarkland.local", "label": "Správce MCP setup" },
+      "worker01": { "role": "skladnik", "loginName": "mcp-skladnik-01@aardvarkland.local", "label": "Skladník 01 příjem" },
+      "worker02": { "role": "skladnik", "loginName": "mcp-skladnik-02@aardvarkland.local", "label": "Skladník 02 putaway" },
+      "worker03": { "role": "skladnik", "loginName": "mcp-skladnik-03@aardvarkland.local", "label": "Skladník 03 picking A" },
+      "worker04": { "role": "skladnik", "loginName": "mcp-skladnik-04@aardvarkland.local", "label": "Skladník 04 picking B" },
+      "worker05": { "role": "skladnik", "loginName": "mcp-skladnik-05@aardvarkland.local", "label": "Skladník 05 packing" },
+      "worker06": { "role": "skladnik", "loginName": "mcp-skladnik-06@aardvarkland.local", "label": "Skladník 06 zásoby/výjimky" },
+      "worker07": { "role": "skladnik", "loginName": "mcp-skladnik-07@aardvarkland.local", "label": "Skladník 07 RF skenery" },
+      "worker08": { "role": "skladnik", "loginName": "mcp-skladnik-08@aardvarkland.local", "label": "Skladník 08 tisk/reprint" },
+      "worker09": { "role": "skladnik", "loginName": "mcp-skladnik-09@aardvarkland.local", "label": "Skladník 09 replenishment" },
+      "worker10": { "role": "skladnik", "loginName": "mcp-skladnik-10@aardvarkland.local", "label": "Skladník 10 flex picking/packing" }
+    },
+    "phases": [
+      {
+        "name": "setup tiskové fronty",
+        "offsetPercent": 0,
+        "actions": [
+          { "actor": "admin", "process": "print_setup_and_label_queue", "data": { "printerCode": "MCP-SHIFT-PRINTER", "printerName": "MCP směnová tiskárna", "protocol": "TCP_9100", "host": "127.0.0.1", "port": "19101", "agentCode": "MCP-SHIFT-AGENT", "agentName": "MCP směnový agent", "agentToken": "mcp-shift-agent-token-2026-local-secret", "labelCode": "AARD1:LOC:MAIN:PACK-01", "title": "MCP Shift", "subtitle": "Směnový test", "fakeTcpCapture": true } }
+        ]
+      },
+      {
+        "name": "start směny: příjem a zásoby",
+        "offsetPercent": 5,
+        "actions": [
+          { "actor": "worker01", "process": "inbound_receive", "data": { "asnReference": "ASN-SHIFT-1001", "lineReference": "1", "quantity": 8 } },
+          { "actor": "worker02", "process": "inventory_move", "data": { "sku": "USB-C-65W-BLK", "quantity": 3, "targetLocation": "A-05-02" } },
+          { "actor": "worker06", "process": "inventory_receive", "data": { "sku": "FLASH-USB-64", "quantity": 1 } },
+          { "actor": "worker07", "process": "rf_scan_expected_steps", "data": { "steps": 2, "hardwareScanner": true, "allowNoTask": true } },
+          { "actor": "worker08", "process": "label_preview_and_queue", "data": { "printerCode": "MCP-SHIFT-PRINTER", "labelCode": "AARD1:LOC:MAIN:A-01-01", "title": "Scanner check", "subtitle": "Start směny", "fakeTcpCapture": true } }
+        ]
+      },
+      {
+        "name": "první vlna objednávek",
+        "offsetPercent": 15,
+        "actions": [
+          { "actor": "manager", "process": "outbound_allocate", "data": { "orderReference": "SO-SHIFT-3001" } },
+          { "actor": "manager", "process": "outbound_release_picking", "data": { "orderReference": "SO-SHIFT-3001", "dynamicPick": true, "pickActors": ["worker03", "worker04", "worker10"] } },
+          { "actor": "manager", "process": "outbound_allocate", "data": { "orderReference": "SO-SHIFT-3002" } },
+          { "actor": "manager", "process": "outbound_release_picking", "data": { "orderReference": "SO-SHIFT-3002", "dynamicPick": true, "pickActors": ["worker03", "worker04", "worker10"] } }
+        ]
+      },
+      {
+        "name": "RF práce a druhý příjem",
+        "offsetPercent": 35,
+        "actions": [
+          { "actor": "worker01", "process": "inbound_receive", "data": { "asnReference": "ASN-SHIFT-1001", "lineReference": "2", "quantity": 5 } },
+          { "actor": "worker04", "process": "task_claim_start_confirm", "data": { "repeat": 2 } },
+          { "actor": "worker06", "process": "inventory_receive", "data": { "sku": "SMARTPLUG-EU", "quantity": 2 } },
+          { "actor": "worker07", "process": "rf_scan_expected_steps", "data": { "steps": 3, "hardwareScanner": true, "allowNoTask": true } },
+          { "actor": "worker09", "process": "inventory_move", "data": { "sku": "SMARTBULB-E27", "quantity": 2, "targetLocation": "A-05-02" } }
+        ]
+      },
+      {
+        "name": "balení a další objednávky",
+        "offsetPercent": 55,
+        "actions": [
+          { "actor": "worker05", "process": "packing_scan_and_ship", "data": { "ship": true, "allowConflictAsIdle": true } },
+          { "actor": "manager", "process": "outbound_allocate", "data": { "orderReference": "SO-SHIFT-3030" } },
+          { "actor": "manager", "process": "outbound_release_picking", "data": { "orderReference": "SO-SHIFT-3030", "dynamicPick": true, "pickActors": ["worker03", "worker04", "worker10"] } },
+          { "actor": "worker02", "process": "inventory_move", "data": { "sku": "SMARTBULB-E27", "quantity": 4, "targetLocation": "A-05-02" } },
+          { "actor": "worker08", "process": "label_preview_and_queue", "data": { "printerCode": "MCP-SHIFT-PRINTER", "labelCode": "AARD1:SKU:MAIN:USB-C-65W-BLK", "title": "SKU label", "subtitle": "Směnový tisk", "fakeTcpCapture": true } },
+          { "actor": "worker09", "process": "inventory_move", "data": { "sku": "THERMAL-PASTE", "quantity": 1, "targetLocation": "A-05-02", "allowNoInventory": true, "allowConflictAsIdle": true } }
+        ]
+      },
+      {
+        "name": "výjimka, reprint a uzávěrka",
+        "offsetPercent": 75,
+        "actions": [
+          { "actor": "worker06", "process": "rf_scan_expected_steps", "data": { "steps": 2, "hardwareScanner": true, "allowNoTask": true } },
+          { "actor": "worker05", "process": "packing_scan_and_ship", "data": { "ship": true, "allowConflictAsIdle": true } },
+          { "actor": "worker06", "process": "label_preview_and_queue", "data": { "printerCode": "MCP-SHIFT-PRINTER", "labelCode": "AARD1:LOC:MAIN:SHIP-01", "title": "Reprint", "subtitle": "Směnový test", "fakeTcpCapture": true } },
+          { "actor": "worker07", "process": "rf_scan_expected_steps", "data": { "steps": 4, "hardwareScanner": true, "allowNoTask": true } },
+          { "actor": "worker08", "process": "label_preview_and_queue", "data": { "printerCode": "MCP-SHIFT-PRINTER", "labelCode": "AARD1:PARCEL:MAIN:P0001", "title": "Parcel label", "subtitle": "Uzávěrka", "fakeTcpCapture": true } },
+          { "actor": "worker10", "process": "task_claim_start_confirm", "data": { "repeat": 1, "allowNoTask": true } },
+          { "actor": "manager", "process": "outbound_allocate", "expectFailure": true, "data": { "orderReference": "SO-SHIFT-3029" } }
+        ]
+      }
+    ]
+  }
+}

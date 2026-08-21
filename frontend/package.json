@@ -1,0 +1,29 @@
+{
+  "name": "@aardvarkland-inc/storage-system-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node ./node_modules/vite/bin/vite.js --host 0.0.0.0 --port 4000 --strictPort",
+    "build": "node ./node_modules/typescript/bin/tsc -b && node ./node_modules/vite/bin/vite.js build",
+    "lint": "node scripts/lint-frontend.mjs",
+    "start": "node server.js",
+    "preview": "node ./node_modules/vite/bin/vite.js preview --host 0.0.0.0 --port 4000 --strictPort",
+    "test": "node --test scripts/*.test.mjs",
+    "typecheck": "node ./node_modules/typescript/bin/tsc --noEmit"
+  },
+  "dependencies": {
+    "@zxing/browser": "^0.2.0",
+    "bwip-js": "^4.10.1",
+    "react": "^19.2.6",
+    "react-dom": "19.2.6"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "6.0.3",
+    "typescript": "6.0.3",
+    "vite": "8.1.5"
+  },
+  "description": "Aardvarkland Storage System frontend."
+}

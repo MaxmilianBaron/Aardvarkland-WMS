@@ -1,29 +1,38 @@
-node_modules/
-dist/
-build/
-.vite/
-.cache/
+# Dependencies and generated output
+**/node_modules/
+**/dist/
+**/build/
+**/coverage/
+**/test-results/
+**/artifacts/
+backend/src/generated/prisma/
 _site/
 
-.env
-.env.*
-!.env.example
-
-*.pem
-*.key
-*.crt
-*.pfx
+# Secrets and local configuration
+**/.env
+**/.env.*
+!**/.env.example
+!**/.env.production.example
+*.jks
+*.keystore
 *.p12
-*.sqlite
-*.sqlite3
+*.pfx
+*.pem
+key.properties
+
+# Local data and logs
 *.db
+*.sqlite*
 *.dump
 *.bak
-*.zip
-
-coverage/
+*.log
+logs/
 reports/
-screenshots/private/
+backups/
 
+# IDE and OS
+.idea/
+.vscode/
+*.iml
 .DS_Store
 Thumbs.db
