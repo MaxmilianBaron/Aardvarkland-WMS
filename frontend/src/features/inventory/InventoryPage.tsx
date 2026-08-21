@@ -37,7 +37,7 @@ export function InventoryPage() {
   }, [query, sourceRows]);
 
   const columns: Column<StockQuant>[] = [
-    { key: 'select', label: '', render: (row) => <input className="radio-input" type="radio" name="quant" data-mcp-row="quant" data-mcp-value={`${row.id} ${row.sku}`} checked={selected?.id === row.id} onChange={() => setSelectedId(row.id)} /> },
+    { key: 'select', label: '', render: (row) => <input className="radio-input" type="radio" name="quant" data-e2e-row="quant" data-e2e-value={`${row.id} ${row.sku}`} checked={selected?.id === row.id} onChange={() => setSelectedId(row.id)} /> },
     { key: 'sku', label: 'SKU', render: (row) => <div><strong>{row.sku}</strong><small>{row.product}</small></div> },
     { key: 'location', label: text.columns.location, render: (row) => <Badge>{row.location}</Badge> },
     { key: 'lot', label: text.columns.lot, render: (row) => row.lot || '-' },
@@ -145,10 +145,10 @@ export function InventoryPage() {
             <label>{text.fields.quantity}<input data-testid="inventory-quantity" type="number" min="1" value={quantity} onChange={(event) => setQuantity(event.target.value)} /></label>
             <label>{text.fields.targetLocation}<input data-testid="inventory-target-location" value={targetLocation} onChange={(event) => setTargetLocation(event.target.value)} placeholder={text.fields.targetPlaceholder} /></label>
             {targetIsCurrentLocation && <p className="form-hint">{text.sameLocationHint}</p>}
-            <Button tone="primary" type="submit" data-mcp-action="inventory-receive" disabled={!selected || mutation.status === 'running'}>{text.buttons.receive}</Button>
+            <Button tone="primary" type="submit" data-e2e-action="inventory-receive" disabled={!selected || mutation.status === 'running'}>{text.buttons.receive}</Button>
             <div className="button-row">
-              <Button type="button" tone="secondary" data-mcp-action="inventory-move" disabled={!selected || !normalizedTargetLocation || targetIsCurrentLocation || mutation.status === 'running'} onClick={move}>{text.buttons.move}</Button>
-              <Button type="button" tone="secondary" data-mcp-action="inventory-adjust" disabled={!selected || mutation.status === 'running'} onClick={adjust}>{text.buttons.adjust}</Button>
+              <Button type="button" tone="secondary" data-e2e-action="inventory-move" disabled={!selected || !normalizedTargetLocation || targetIsCurrentLocation || mutation.status === 'running'} onClick={move}>{text.buttons.move}</Button>
+              <Button type="button" tone="secondary" data-e2e-action="inventory-adjust" disabled={!selected || mutation.status === 'running'} onClick={adjust}>{text.buttons.adjust}</Button>
             </div>
             <ActionStatus mutation={mutation} />
           </form>

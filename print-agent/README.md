@@ -39,11 +39,5 @@ npm run fake:printer
 
 Point a `TCP_9100` printer mapping to `127.0.0.1:9100`. Captured raw ZPL is stored in `print-agent/captures/`; the fake printer reports `OK` only when the payload starts with `^XA` and ends with `^XZ`.
 
-For a fuller WMS-level simulator that also drives RF scanner input, queues a
-targeted print job, captures fake TCP 9100 ZPL, renders offline preview
-artifacts, and reports the job result back through the Print Agent contract:
-
-```powershell
-cd "..\MCP"
-npm run hardware:sim -- --render-mode=offline
-```
+Use the fake printer for local transport checks. Validate the complete RF and
+printing workflow with the target scanner and printer before production use.

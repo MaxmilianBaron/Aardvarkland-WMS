@@ -102,7 +102,7 @@ npm ci
 npm run check
 ```
 
-Hardware simulators and role journeys live in `MCP/`. Software simulation does not replace acceptance testing with real scanners and printers.
+Software checks do not replace acceptance testing with real scanners and printers.
 
 ## Building
 
@@ -133,7 +133,6 @@ The backend is the source of truth for permissions, inventory, workflows, audit 
 - `backend/` — NestJS API, Prisma schema, migrations, tests, and OpenAPI export
 - `frontend/` — React/Vite application and PWA shell
 - `print-agent/` — local ZPL printer bridge
-- `MCP/` — repeatable role, workflow, and hardware simulations
 - `scripts/`, `service/` — deployment, backup, acceptance, and Windows service tooling
 - `demo/` — independent GitHub Pages product preview
 - `docs/` — architecture, operations, reliability, and deployment documentation

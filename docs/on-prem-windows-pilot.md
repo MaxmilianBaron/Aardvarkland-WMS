@@ -109,13 +109,13 @@ token rotation, authenticated realtime invalidation, and the fake-printer
 hardware simulation:
 
 ```powershell
-.\scripts\Invoke-AardvarklandOperationalGate.ps1 -ApplyMigrations -LiveApiE2e -HardwareSimulation -RoleJourneyScreenshots
+.\scripts\Invoke-AardvarklandOperationalGate.ps1 -ApplyMigrations -LiveApiE2e
 ```
 
 ## Operational Acceptance Checklist
 
 Keep these items open until they are proven on the pilot machine. Software-only
-MCP or fake-printer tests are useful rehearsals, but they do not close physical
+Software and fake-printer tests are useful rehearsals, but they do not close physical
 hardware acceptance.
 
 - [ ] Run `.\scripts\Invoke-AardvarklandBackupDrill.ps1` against a
@@ -165,13 +165,6 @@ shared, rotate it in WMS and update the workstation config immediately.
 ```powershell
 cd print-agent
 npm run start
-```
-
-For hardware-free checks:
-
-```powershell
-cd MCP
-npm run hardware:sim -- --render-mode=offline
 ```
 
 ## Unified Pilot Acceptance

@@ -248,16 +248,16 @@ export function PackingPage() {
             <div className="action-panel">
               <form onSubmit={submit}>
                 <label>{text.scanLabel}<input data-testid="packing-scan-input" value={scan} onChange={(event) => setScan(event.target.value)} autoFocus placeholder={text.scanPlaceholder} disabled={!enrichedLines.length} /></label>
-                <Button tone="primary" type="submit" data-mcp-action="packing-confirm-scan" disabled={!enrichedLines.length}>{text.confirmScan}</Button>
+                <Button tone="primary" type="submit" data-e2e-action="packing-confirm-scan" disabled={!enrichedLines.length}>{text.confirmScan}</Button>
               </form>
               <div className="rf-fast-actions">
-                {import.meta.env.DEV && enrichedLines.map((line) => <Button key={line.sku} size="sm" data-mcp-action="packing-fill-sku" data-mcp-value={line.sku} onClick={() => setScan(line.sku)}>{line.sku}</Button>)}
+                {import.meta.env.DEV && enrichedLines.map((line) => <Button key={line.sku} size="sm" data-e2e-action="packing-fill-sku" data-e2e-value={line.sku} onClick={() => setScan(line.sku)}>{line.sku}</Button>)}
               </div>
               <label>{text.shipment}<input data-testid="packing-shipment-id" value={activeShipmentId ?? text.shipmentWillBeCreated} readOnly /></label>
               <PermissionGate permission="shipment.manage">
-                <Button tone="secondary" data-mcp-action="packing-create-package" disabled={!readyForLabel || !activeOrder || Boolean(packageReference) || mutation.status === 'running'} onClick={createPackage}>{text.createPackage}</Button>
-                <Button tone="primary" data-mcp-action="packing-generate-label" disabled={!canGenerateLabel || labelGenerated || mutation.status === 'running'} onClick={printLabel}>{text.generateLabel}</Button>
-                <Button tone="secondary" data-mcp-action="packing-ship-shipment" disabled={!labelGenerated || shipped || !activeOrder || mutation.status === 'running'} onClick={ship}>{text.shipShipment}</Button>
+                <Button tone="secondary" data-e2e-action="packing-create-package" disabled={!readyForLabel || !activeOrder || Boolean(packageReference) || mutation.status === 'running'} onClick={createPackage}>{text.createPackage}</Button>
+                <Button tone="primary" data-e2e-action="packing-generate-label" disabled={!canGenerateLabel || labelGenerated || mutation.status === 'running'} onClick={printLabel}>{text.generateLabel}</Button>
+                <Button tone="secondary" data-e2e-action="packing-ship-shipment" disabled={!labelGenerated || shipped || !activeOrder || mutation.status === 'running'} onClick={ship}>{text.shipShipment}</Button>
               </PermissionGate>
               <ActionStatus mutation={mutation} />
             </div>

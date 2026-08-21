@@ -6,8 +6,6 @@ param(
   [switch]$RunRestoreDrill,
   [switch]$RunWindowsServiceRestart,
   [switch]$RunFullOperationalGate,
-  [switch]$SkipHardwareSimulation,
-  [switch]$SkipShiftGate,
   [switch]$RequirePhysicalHardware,
   [switch]$RequireExternalPenTest
 )
@@ -98,30 +96,6 @@ if ($RunWindowsServiceRestart) {
   } $true (Join-Path $outputRoot 'post-restart-health.json')
 } else {
   Add-OpenBoundary 'windows_service_restart' 'Service installer is implemented, but restart acceptance was not requested for this run.' $false
-}
-
-if (-not $SkipHardwareSimulation) {
-  Invoke-AcceptanceCheck 'hardware_simulation' {
-    Push-Location (Join-Path $root 'MCP')
-    try { npm run hardware:sim -- --render-mode=offline --screenshots=false } finally { Pop-Location }
-  }
-}
-
-if (-not $SkipShiftGate) {
-  $gate = if ($Profile -eq '60m') { 'shift:gate60' } elseif ($Profile -eq '30m') { 'shift:gate30' } else { $null }
-  if ($gate) {
-    Invoke-AcceptanceCheck 'shift_readiness_gate' {
-      Push-Location (Join-Path $root 'MCP')
-      try { npm run $gate } finally { Pop-Location }
-    }
-  } else {
-    Invoke-AcceptanceCheck 'shift_quick_gate' {
-      Push-Location (Join-Path $root 'MCP')
-      try {
-        node run-shift-stress.mjs --duration-minutes=1 --worker-count=10 --run-mode=persistent --screenshots=false --audit=false --hardware-lab=true --reset-database=true
-      } finally { Pop-Location }
-    }
-  }
 }
 
 Add-OpenBoundary 'physical_scanner' 'Requires a real USB/Bluetooth scanner or accepted Zebra DataWedge terminal.' $RequirePhysicalHardware

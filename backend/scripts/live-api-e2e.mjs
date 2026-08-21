@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 
 const apiBaseUrl = String(process.env.WMS_E2E_API_URL || 'http://127.0.0.1:4001/api').replace(/\/+$/, '');
-const email = process.env.WMS_E2E_EMAIL || 'mcp-skladnik@aardvarkland.local';
-const password = process.env.WMS_E2E_PASSWORD || 'Mcp-Local-42!';
+const email = process.env.WMS_E2E_EMAIL || 'demo-skladnik@aardvarkland.local';
+const password = process.env.WMS_E2E_PASSWORD || 'Demo-Local-42!';
 const warehouse = process.env.WMS_E2E_WAREHOUSE || 'MAIN';
 
 const firstLogin = await login();

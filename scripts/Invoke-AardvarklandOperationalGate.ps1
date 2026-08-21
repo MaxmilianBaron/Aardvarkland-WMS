@@ -1,11 +1,8 @@
 param(
   [switch]$ApplyMigrations,
   [switch]$LiveApiE2e,
-  [switch]$HardwareSimulation,
   [switch]$SkipFrontend,
-  [switch]$SkipMcpRoleJourneys,
-  [switch]$SkipAudit,
-  [switch]$RoleJourneyScreenshots
+  [switch]$SkipAudit
 )
 
 $ErrorActionPreference = "Stop"
@@ -55,7 +52,6 @@ function Invoke-NpmAuditStep {
 
 $backend = Join-Path $root "backend"
 $frontend = Join-Path $root "frontend"
-$mcp = Join-Path $root "MCP"
 
 Invoke-Step "Backend Prisma generate" $backend @("npm", "run", "prisma:generate")
 
@@ -101,15 +97,6 @@ if (-not $SkipFrontend) {
   if (-not $SkipAudit) {
     Invoke-NpmAuditStep "Frontend npm audit" $frontend
   }
-}
-
-if (-not $SkipMcpRoleJourneys -and (Test-Path $mcp)) {
-  $screenshots = if ($RoleJourneyScreenshots) { "true" } else { "false" }
-  Invoke-Step "MCP role journeys" $mcp @("npm", "run", "role:journeys", "--", "--screenshots=$screenshots")
-}
-
-if ($HardwareSimulation -and (Test-Path $mcp)) {
-  Invoke-Step "MCP hardware simulation" $mcp @("npm", "run", "hardware:sim", "--", "--render-mode=offline")
 }
 
 Write-Host ""

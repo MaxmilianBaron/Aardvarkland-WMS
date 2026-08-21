@@ -563,7 +563,7 @@ const frontendEventRows = [
 const readinessRows = [
   { title: { cs: 'Startovací kontrola', en: 'Startup preflight', ua: 'Стартова перевірка' }, detail: { cs: 'migrace, tabulky a oprávnění ověřeny', en: 'migrations, tables, and permissions verified', ua: 'міграції, таблиці та права перевірено' }, status: 'OK' },
   { title: { cs: 'OpenAPI kontrakt', en: 'OpenAPI contract', ua: 'OpenAPI контракт' }, detail: { cs: 'frontendové endpointy sedí s exportem API', en: 'frontend endpoints match the API export', ua: 'фронтенд endpointy відповідають експорту API' }, status: 'OK' },
-  { title: { cs: 'Noční gate', en: 'Nightly gate', ua: 'Нічна перевірка' }, detail: { cs: 'ověřovací běh ukládá MCP reporty jako artefakty', en: 'workflow stores MCP reports as artifacts', ua: 'перевірка зберігає MCP звіти як артефакти' }, status: 'READY' },
+  { title: { cs: 'Noční gate', en: 'Nightly gate', ua: 'Нічна перевірка' }, detail: { cs: 'ověřovací běh ukládá reporty jako artefakty', en: 'workflow stores verification reports as artifacts', ua: 'перевірка зберігає звіти як артефакти' }, status: 'READY' },
   { title: { cs: 'PWA prostředí', en: 'PWA shell', ua: 'PWA середовище' }, detail: { cs: 'offline prostředí a banner aktualizace připraven', en: 'offline app shell and update banner ready', ua: 'offline середовище і банер оновлення готові' }, status: 'READY' },
 ];
 
