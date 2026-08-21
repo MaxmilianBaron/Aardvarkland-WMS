@@ -2,7 +2,7 @@
 
 Open-source warehouse management system for inventory, receiving, picking, packing, shipping, barcode workflows, printing, and warehouse operations.
 
-[Live Demo](https://maxmilianbaron.github.io/Aardvarkland-WMS/) · [Screenshots](#screenshots) · [Quick Start](#quick-start) · [Documentation](docs/) · [WMS Mini](https://github.com/MaxmilianBaron/Aardvarkland-WMS-Mini)
+[Live Demo](https://maxmilianbaron.github.io/Aardvarkland-WMS/) · [Quick Start](#quick-start) · [Documentation](docs/) · [WMS Mini](https://github.com/MaxmilianBaron/Aardvarkland-WMS-Mini)
 
 ![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)
 
@@ -28,14 +28,6 @@ Aardvarkland WMS is a self-hosted, full-stack warehouse management platform. A R
 - Control Tower, analytics, incidents, alerts, readiness, and audit exports
 - Czech, English, Ukrainian, French, German, and Spanish interfaces
 - Docker-based local stack and Windows operational scripts
-
-## Screenshots
-
-The live demo uses safe sample data and does not connect to a production backend.
-
-| Dashboard and role workflow | Mobile warehouse view |
-| --- | --- |
-| ![Aardvarkland WMS dashboard](docs/images/wms-dashboard.png) | ![Aardvarkland WMS mobile view](docs/images/wms-mobile.png) |
 
 ## Live Demo
 

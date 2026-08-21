@@ -14,7 +14,7 @@ Thank you for helping improve Aardvarkland WMS.
 
 Run `npm run verify` in `backend/`, the typecheck, lint, tests, and build in `frontend/`, and `npm run check` in `print-agent/`. Add tests for behavior changes and update documentation when commands, configuration, APIs, or product boundaries change.
 
-Keep pull requests focused. Do not include generated output, credentials, customer data, local databases, production URLs, signing files, or real warehouse exports. Use fictional examples in tests and screenshots.
+Keep pull requests focused. Do not include generated output, credentials, customer data, local databases, production URLs, signing files, real warehouse exports, or screenshots captured from personal devices. Use fictional examples in tests and documentation.
 
 ## Pull requests
 
