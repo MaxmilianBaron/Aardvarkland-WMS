@@ -7,7 +7,7 @@ export class LoginDto {
   @MaxLength(320)
   email!: string;
 
-  @ApiProperty({ example: 'Mcp-Local-42!' })
+  @ApiProperty({ example: 'Demo-Local-42!' })
   @IsString()
   @MinLength(1)
   @MaxLength(128)

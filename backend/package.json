@@ -23,8 +23,6 @@
     "prisma:status": "node ./node_modules/prisma/build/index.js migrate status",
     "prisma:studio": "node ./node_modules/prisma/build/index.js studio",
     "db:seed": "npm run prisma:generate && node ./node_modules/tsx/dist/cli.mjs prisma/seed.ts",
-    "db:reset:mcp": "node scripts/reset-mcp-db.mjs",
-    "db:import:mcp-scenario": "node ./node_modules/tsx/dist/cli.mjs scripts/import-mcp-scenario.ts ../MCP/scenarios/eshop-electro-lite.json",
     "permissions:check": "node ./node_modules/tsx/dist/cli.mjs scripts/check-seed-permissions.ts",
     "openapi:export": "node ./node_modules/ts-node/dist/bin.js --project tsconfig.scripts.json --transpile-only scripts/export-openapi.ts",
     "worker:queue": "node -r ts-node/register -r tsconfig-paths/register src/queue-worker.main.ts",

@@ -54,7 +54,7 @@ export function OutboundPage() {
     return sourceRows.filter((order) => order.status !== 'Shipped');
   }, [filter, sourceRows]);
   const columns: Column<Order>[] = [
-    { key: 'select', label: '', render: (row) => <input type="radio" name="order" data-mcp-row="order" data-mcp-value={row.id} checked={selected?.id === row.id} onChange={() => setSelectedId(row.id)} /> },
+    { key: 'select', label: '', render: (row) => <input type="radio" name="order" data-e2e-row="order" data-e2e-value={row.id} checked={selected?.id === row.id} onChange={() => setSelectedId(row.id)} /> },
     { key: 'id', label: text.columns.order, render: (row) => <strong>{row.id}</strong> },
     { key: 'channel', label: text.columns.channel, render: (row) => row.channel || '-' },
     { key: 'priority', label: text.columns.priority, render: (row) => <Badge tone={row.priority === 'Rush' ? 'critical' : row.priority === 'High' ? 'warning' : 'neutral'}>{priorityLabel(row.priority, language)}</Badge> },
@@ -92,9 +92,9 @@ export function OutboundPage() {
           <article><span>{text.shippingProgress}</span><strong>{progress}%</strong><ProgressBar value={progress} /></article>
         </div>
         <div className="action-panel">
-          <Button tone="primary" data-mcp-action="outbound-allocate-selected" disabled={!selected || mutation.status === 'running'} onClick={allocate}>{text.allocateButton}</Button>
-          <Button tone="secondary" data-mcp-action="outbound-release-picking" disabled={!selected || mutation.status === 'running'} onClick={release}>{text.releaseButton}</Button>
-          <Button tone="secondary" data-mcp-action="outbound-open-packing" onClick={() => { window.location.hash = '/packing'; }}>{text.openPacking}</Button>
+          <Button tone="primary" data-e2e-action="outbound-allocate-selected" disabled={!selected || mutation.status === 'running'} onClick={allocate}>{text.allocateButton}</Button>
+          <Button tone="secondary" data-e2e-action="outbound-release-picking" disabled={!selected || mutation.status === 'running'} onClick={release}>{text.releaseButton}</Button>
+          <Button tone="secondary" data-e2e-action="outbound-open-packing" onClick={() => { window.location.hash = '/packing'; }}>{text.openPacking}</Button>
           <ActionStatus mutation={mutation} />
         </div>
       </Card>

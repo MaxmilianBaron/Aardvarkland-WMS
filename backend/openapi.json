@@ -15501,7 +15501,7 @@
           },
           "password": {
             "type": "string",
-            "example": "Mcp-Local-42!"
+            "example": "Demo-Local-42!"
           },
           "mfaCode": {
             "type": "string",

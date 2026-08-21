@@ -109,7 +109,7 @@ export function SettingsPage() {
             <label>{text.fields.login}<input data-testid="settings-user-login" value={loginName} onChange={(event) => setLoginName(event.target.value)} minLength={2} maxLength={320} required /></label>
             <label>{text.fields.password}<input data-testid="settings-user-password" value={password} onChange={(event) => setPassword(event.target.value)} type="password" minLength={12} maxLength={128} required /></label>
             <label>{text.fields.role}<select data-testid="settings-user-role" value={roleCode} onChange={(event) => setRoleCode(event.target.value as RoleId)}>{creatableRoles.map((item) => <option key={item.value} value={item.value}>{pickLanguage(language, item.label)}</option>)}</select></label>
-            <Button tone="primary" type="submit" data-mcp-action="settings-create-user" disabled={mutation.status === 'running'}>{text.users.submit}</Button>
+            <Button tone="primary" type="submit" data-e2e-action="settings-create-user" disabled={mutation.status === 'running'}>{text.users.submit}</Button>
             <ActionStatus mutation={mutation} />
           </form>
         )}

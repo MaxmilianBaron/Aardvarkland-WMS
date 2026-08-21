@@ -58,7 +58,7 @@ export function TasksPage() {
   }, [filter, sourceRows]);
 
   const columns: Column<WarehouseTask>[] = [
-    { key: 'select', label: '', render: (row) => <input type="radio" name="task" data-mcp-row="task" data-mcp-value={row.id} checked={selected?.id === row.id} onChange={() => setSelectedId(row.id)} /> },
+    { key: 'select', label: '', render: (row) => <input type="radio" name="task" data-e2e-row="task" data-e2e-value={row.id} checked={selected?.id === row.id} onChange={() => setSelectedId(row.id)} /> },
     { key: 'id', label: text.columns.task, render: (row) => <strong>{row.id}</strong> },
     { key: 'type', label: text.columns.type, render: (row) => <Badge>{taskTypeLabel(row.type, language)}</Badge> },
     { key: 'assignee', label: text.columns.worker, render: (row) => row.assignee || '-' },
@@ -100,9 +100,9 @@ export function TasksPage() {
           <article><span>{text.metrics.priority}</span><strong>{highestPriority}</strong><ProgressBar value={highestPriority} /></article>
         </div>
         <div className="action-panel">
-          <Button tone="primary" data-mcp-action="task-claim-next" disabled={mutation.status === 'running'} onClick={claimNext}>{text.buttons.claim}</Button>
-          <Button tone="secondary" data-mcp-action="task-start-selected" disabled={!selected || mutation.status === 'running'} onClick={startSelected}>{text.buttons.start}</Button>
-          <Button tone="secondary" data-mcp-action="task-confirm-selected" disabled={!selected || mutation.status === 'running'} onClick={confirmSelected}>{text.buttons.confirm}</Button>
+          <Button tone="primary" data-e2e-action="task-claim-next" disabled={mutation.status === 'running'} onClick={claimNext}>{text.buttons.claim}</Button>
+          <Button tone="secondary" data-e2e-action="task-start-selected" disabled={!selected || mutation.status === 'running'} onClick={startSelected}>{text.buttons.start}</Button>
+          <Button tone="secondary" data-e2e-action="task-confirm-selected" disabled={!selected || mutation.status === 'running'} onClick={confirmSelected}>{text.buttons.confirm}</Button>
           <ActionStatus mutation={mutation} />
         </div>
       </Card>

@@ -4,7 +4,7 @@ Datum: 2026-05-19
 
 Aktualizace 2026-05-22: probehla prvni pilotni hardening vlna pro maly
 on-prem Windows pilot. Produkcni secret/config hardening, CSP, dependency
-audity, lockfile pro `MCP`/`print-agent`, Vite 8 build warning fix, lokace/
+audity, lockfile pro `print-agent`, Vite 8 build warning fix, lokace/
 putaway, kvalita/vratky/karantena, inventury, multi-printer queue akce a RF
 scanner assignment jsou dodelane. Fyzicky scanner/tiskarna, restore drill a
 Windows service acceptance zustavaji otevrene.
@@ -138,9 +138,8 @@ Do skutecneho provozu jeste potrebuje:
 - Frontend `npm run build`: OK
 
 Aktualizace 2026-05-22: backend `npm run verify`, frontend `npm run lint`,
-`npm test`, `npm run build`, print-agent `npm run check`, `MCP`
-`npm run role:journeys -- --screenshots=false` a dependency audity pro
-`backend`, `frontend`, `MCP` a `print-agent` prosly. `config.js` je nacitany jako
+`npm test`, `npm run build`, print-agent `npm run check` a dependency audity pro
+`backend`, `frontend` a `print-agent` prosly. `config.js` je nacitany jako
 `type="module"` a produkcni frontend build uz nehlasi drivejsi chunk/config
 warning.
 

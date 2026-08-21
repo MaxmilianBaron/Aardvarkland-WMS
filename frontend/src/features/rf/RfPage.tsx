@@ -521,8 +521,8 @@ export function RfPage() {
             <Button size="sm" type="button" tone={rfDisplayMode === 'MOBILE' ? 'primary' : 'secondary'} onClick={() => { void setRfDisplayMode('MOBILE'); }} disabled={workContextStatus === 'loading'}>{text.rfModes.MOBILE}</Button>
             <Button size="sm" type="button" tone={rfDisplayMode === 'TERMINAL' ? 'primary' : 'secondary'} onClick={() => { void setRfDisplayMode('TERMINAL'); }} disabled={workContextStatus === 'loading'}>{text.rfModes.TERMINAL}</Button>
           </div>
-          <Button data-mcp-action="rf-toggle-offline" onClick={() => setOffline((value) => !value)} tone={offline ? 'primary' : 'secondary'}>{offline ? text.offlineOn : text.goOffline}</Button>
-          <Button data-mcp-action="rf-sync-offline" onClick={syncPending} disabled={!pending.length || mutation.status === 'running'}>{text.sendQueue} ({pending.length})</Button>
+          <Button data-e2e-action="rf-toggle-offline" onClick={() => setOffline((value) => !value)} tone={offline ? 'primary' : 'secondary'}>{offline ? text.offlineOn : text.goOffline}</Button>
+          <Button data-e2e-action="rf-sync-offline" onClick={syncPending} disabled={!pending.length || mutation.status === 'running'}>{text.sendQueue} ({pending.length})</Button>
         </div>
       </section>
 
@@ -588,12 +588,12 @@ export function RfPage() {
               disabled={!selectedTask || !scannerDeviceReference.trim()}
               data-testid="rf-scan-input"
             />
-            <PermissionGate permission="rf.manage"><Button tone="primary" type="submit" data-mcp-action="rf-confirm-scan" disabled={!selectedTask || !scannerDeviceReference.trim() || mutation.status === 'running'}>{text.confirmScan}</Button></PermissionGate>
+            <PermissionGate permission="rf.manage"><Button tone="primary" type="submit" data-e2e-action="rf-confirm-scan" disabled={!selectedTask || !scannerDeviceReference.trim() || mutation.status === 'running'}>{text.confirmScan}</Button></PermissionGate>
           </form>
           <div className="scanner-fast-actions">
-            {showTestAssist && <Button size="sm" data-mcp-action="rf-fill-expected" onClick={() => setScanValue(current.expectedCode)} disabled={!selectedTask}>{text.fillExpected}</Button>}
-            <Button size="sm" data-mcp-action="rf-reset-flow" onClick={() => { setStepIndex(0); setSession(null); }}>{text.resetFlow}</Button>
-            <Button size="sm" data-mcp-action="rf-start-resume" onClick={() => { void startSession(); }} disabled={!scannerDeviceReference.trim() || mutation.status === 'running'}>{text.startOrResume}</Button>
+            {showTestAssist && <Button size="sm" data-e2e-action="rf-fill-expected" onClick={() => setScanValue(current.expectedCode)} disabled={!selectedTask}>{text.fillExpected}</Button>}
+            <Button size="sm" data-e2e-action="rf-reset-flow" onClick={() => { setStepIndex(0); setSession(null); }}>{text.resetFlow}</Button>
+            <Button size="sm" data-e2e-action="rf-start-resume" onClick={() => { void startSession(); }} disabled={!scannerDeviceReference.trim() || mutation.status === 'running'}>{text.startOrResume}</Button>
           </div>
           <div className="scanner-exception-actions" aria-label={text.exceptionTitle}>
             <span>{text.exceptionHint}</span>
@@ -604,7 +604,7 @@ export function RfPage() {
                   size="sm"
                   type="button"
                   tone={action.code === 'SHORT_PICK' ? 'danger' : 'secondary'}
-                  data-mcp-action={index === 0 ? 'rf-report-problem' : `rf-report-${action.code.toLowerCase().replaceAll('_', '-')}`}
+                  data-e2e-action={index === 0 ? 'rf-report-problem' : `rf-report-${action.code.toLowerCase().replaceAll('_', '-')}`}
                   onClick={() => { void reportProblem(action); }}
                   disabled={!selectedTask || mutation.status === 'running'}
                 >
@@ -620,7 +620,7 @@ export function RfPage() {
       <Card title={text.taskQueue} eyebrow={text.guidedWork} className="span-5">
         <div className="rf-task-queue">
           {tasksQueue.length ? tasksQueue.slice(0, 8).map((task) => (
-            <button key={task.id} data-mcp-row="rf-task" data-mcp-value={task.id} className={cx('rf-task-row', selectedTask?.id === task.id && 'is-active')} onClick={() => { setSelectedTaskId(task.id); setSession(null); setStepIndex(0); }}>
+            <button key={task.id} data-e2e-row="rf-task" data-e2e-value={task.id} className={cx('rf-task-row', selectedTask?.id === task.id && 'is-active')} onClick={() => { setSelectedTaskId(task.id); setSession(null); setStepIndex(0); }}>
               <span><strong>{task.id}</strong><small>{task.fromLocationCode ?? '—'} → {task.toLocationCode ?? '—'}</small></span>
               <span><StatusPill value={task.status} /><small>{text.priority} {task.priority}</small></span>
             </button>

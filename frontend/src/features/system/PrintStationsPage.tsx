@@ -356,7 +356,7 @@ export function PrintStationsPage() {
         </div>
         <div className="button-row">
           <ResourceFreshness status={resource.status} refreshedAt={resource.refreshedAt} ageSeconds={resource.ageSeconds} stale={resource.stale} />
-          <Button size="sm" type="button" data-mcp-action="print-refresh" onClick={resource.refresh} disabled={resource.status === 'loading'}>{text.refresh}</Button>
+          <Button size="sm" type="button" data-e2e-action="print-refresh" onClick={resource.refresh} disabled={resource.status === 'loading'}>{text.refresh}</Button>
         </div>
       </section>
 
@@ -489,7 +489,7 @@ export function PrintStationsPage() {
             <label>{text.fields.host}<input data-testid="print-printer-host" value={printerForm.host} onChange={(event) => setPrinterForm((form) => ({ ...form, host: event.target.value }))} autoComplete="off" /></label>
             <label>{text.fields.port}<input data-testid="print-printer-port" value={printerForm.port} onChange={(event) => setPrinterForm((form) => ({ ...form, port: event.target.value }))} inputMode="numeric" /></label>
             <label>{text.fields.windowsName}<input data-testid="print-printer-windows-name" value={printerForm.windowsPrinterName} onChange={(event) => setPrinterForm((form) => ({ ...form, windowsPrinterName: event.target.value }))} autoComplete="off" /></label>
-            <Button tone="primary" type="submit" data-mcp-action="print-save-printer" disabled={mutation.status === 'running'}>{text.save}</Button>
+            <Button tone="primary" type="submit" data-e2e-action="print-save-printer" disabled={mutation.status === 'running'}>{text.save}</Button>
           </form>
         </Card>
       )}
@@ -502,8 +502,8 @@ export function PrintStationsPage() {
             <label>{text.fields.token}<input data-testid="print-agent-token" type="password" value={agentForm.token} onChange={(event) => setAgentForm((form) => ({ ...form, token: event.target.value }))} autoComplete="new-password" minLength={32} required /></label>
             <label>{text.fields.agentPrinters}<input data-testid="print-agent-printers" value={agentForm.printerCodes} onChange={(event) => setAgentForm((form) => ({ ...form, printerCodes: event.target.value }))} autoComplete="off" placeholder="PACK-01, SHIP-01" /></label>
             <div className="form-actions">
-              <Button type="button" data-mcp-action="print-generate-agent-token" onClick={generateAgentToken}>{text.generateToken}</Button>
-              <Button tone="primary" type="submit" data-mcp-action="print-save-agent" disabled={mutation.status === 'running' || agentForm.token.length < 32}>{text.save}</Button>
+              <Button type="button" data-e2e-action="print-generate-agent-token" onClick={generateAgentToken}>{text.generateToken}</Button>
+              <Button tone="primary" type="submit" data-e2e-action="print-save-agent" disabled={mutation.status === 'running' || agentForm.token.length < 32}>{text.save}</Button>
             </div>
           </form>
         </Card>
@@ -525,7 +525,7 @@ export function PrintStationsPage() {
             <label>{text.fields.worker}<input data-testid="scanner-worker" value={scannerForm.assignedWorkerId} onChange={(event) => setScannerForm((form) => ({ ...form, assignedWorkerId: event.target.value }))} autoComplete="off" /></label>
             <label>{text.fields.battery}<input data-testid="scanner-battery" value={scannerForm.batteryLevel} onChange={(event) => setScannerForm((form) => ({ ...form, batteryLevel: event.target.value.replace(/\D/g, '').slice(0, 3) }))} inputMode="numeric" /></label>
             <label>{text.fields.signal}<input data-testid="scanner-signal" value={scannerForm.signalStrength} onChange={(event) => setScannerForm((form) => ({ ...form, signalStrength: event.target.value.replace(/\D/g, '').slice(0, 3) }))} inputMode="numeric" /></label>
-            <Button tone="primary" type="submit" data-mcp-action="scanner-save" disabled={mutation.status === 'running'}>{text.save}</Button>
+            <Button tone="primary" type="submit" data-e2e-action="scanner-save" disabled={mutation.status === 'running'}>{text.save}</Button>
           </form>
         </Card>
       )}
@@ -545,8 +545,8 @@ export function PrintStationsPage() {
           <label>{text.fields.title}<input data-testid="print-label-title" value={labelForm.title} onChange={(event) => updateLabelForm({ title: event.target.value })} autoComplete="off" /></label>
           <label>{text.fields.subtitle}<input data-testid="print-label-subtitle" value={labelForm.subtitle} onChange={(event) => updateLabelForm({ subtitle: event.target.value })} autoComplete="off" /></label>
           <div className="form-actions">
-            <Button tone="primary" type="submit" data-mcp-action="print-label-preview" disabled={mutation.status === 'running'}>{text.preview}</Button>
-            <Button type="button" data-mcp-action="print-label-enqueue" onClick={enqueueLabel} disabled={mutation.status === 'running' || !canEnqueueLabel}>{text.enqueue}</Button>
+            <Button tone="primary" type="submit" data-e2e-action="print-label-preview" disabled={mutation.status === 'running'}>{text.preview}</Button>
+            <Button type="button" data-e2e-action="print-label-enqueue" onClick={enqueueLabel} disabled={mutation.status === 'running' || !canEnqueueLabel}>{text.enqueue}</Button>
           </div>
         </form>
       </Card>

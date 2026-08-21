@@ -512,46 +512,46 @@ async function runSeed() {
   });
 
   if (nodeEnv !== 'production') {
-    const localMcpUsers = [
+    const localDemoUsers = [
       {
-        email: 'mcp-skladnik@aardvarkland.local',
-        displayName: 'MCP Skladník',
+        email: 'demo-skladnik@aardvarkland.local',
+        displayName: 'Demo Skladník',
         roleId: workerRole.id,
       },
       {
-        email: 'mcp-vedouci@aardvarkland.local',
-        displayName: 'MCP Vedoucí',
+        email: 'demo-vedouci@aardvarkland.local',
+        displayName: 'Demo Vedoucí',
         roleId: managerRole.id,
       },
       {
-        email: 'mcp-vedouci-shift@aardvarkland.local',
-        displayName: 'MCP Vedoucí směny',
+        email: 'demo-vedouci-shift@aardvarkland.local',
+        displayName: 'Demo Vedoucí směny',
         roleId: managerRole.id,
       },
       {
-        email: 'mcp-spravce@aardvarkland.local',
-        displayName: 'MCP Správce',
+        email: 'demo-spravce@aardvarkland.local',
+        displayName: 'Demo Správce',
         roleId: adminRole.id,
       },
       ...Array.from({ length: 10 }, (_, index) => ({
-        email: `mcp-skladnik-${String(index + 1).padStart(2, '0')}@aardvarkland.local`,
-        displayName: `MCP Skladník ${String(index + 1).padStart(2, '0')}`,
+        email: `demo-skladnik-${String(index + 1).padStart(2, '0')}@aardvarkland.local`,
+        displayName: `Demo Skladník ${String(index + 1).padStart(2, '0')}`,
         roleId: workerRole.id,
       })),
     ];
 
-    for (const localMcpUser of localMcpUsers) {
+    for (const localDemoUser of localDemoUsers) {
       const user = await seedDb.user.upsert({
-        where: { email: localMcpUser.email },
+        where: { email: localDemoUser.email },
         update: {
-          displayName: localMcpUser.displayName,
-          passwordHash: await hash('Mcp-Local-42!'),
+          displayName: localDemoUser.displayName,
+          passwordHash: await hash('Demo-Local-42!'),
           status: 'ACTIVE',
         },
         create: {
-          email: localMcpUser.email,
-          displayName: localMcpUser.displayName,
-          passwordHash: await hash('Mcp-Local-42!'),
+          email: localDemoUser.email,
+          displayName: localDemoUser.displayName,
+          passwordHash: await hash('Demo-Local-42!'),
           status: 'ACTIVE',
         },
       });
@@ -560,7 +560,7 @@ async function runSeed() {
         where: {
           userId_roleId_warehouseId: {
             userId: user.id,
-            roleId: localMcpUser.roleId,
+            roleId: localDemoUser.roleId,
             warehouseId: warehouse.id,
           },
         },

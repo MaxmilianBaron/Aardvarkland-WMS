@@ -39,7 +39,7 @@ export function WavesPage() {
   const availablePickers = 0;
 
   const columns: Column<WavePlan>[] = [
-    { key: 'select', label: '', render: (row) => <input type="radio" name="wave" data-mcp-row="wave" data-mcp-value={row.id} checked={selected?.id === row.id} onChange={() => setSelectedId(row.id)} /> },
+    { key: 'select', label: '', render: (row) => <input type="radio" name="wave" data-e2e-row="wave" data-e2e-value={row.id} checked={selected?.id === row.id} onChange={() => setSelectedId(row.id)} /> },
     { key: 'id', label: text.columns.wave, render: (row) => <button className="link-button" type="button" onClick={() => { setSelectedId(row.id); setDrawerOpen(true); }}><strong>{row.id}</strong></button> },
     { key: 'status', label: text.columns.status, render: (row) => <StatusPill value={released.includes(row.id) ? 'Running' : row.status} /> },
     { key: 'cutoff', label: text.columns.deadline, render: (row) => row.cutoff },
@@ -82,7 +82,7 @@ export function WavesPage() {
           className="span-8"
           action={(
             <PermissionGate permission="wave.manage" fallback={<Badge tone="warning">{text.readOnly}</Badge>}>
-              <Button tone="primary" data-mcp-action="wave-release-selected" disabled={!selected || mutation.status === 'running'} onClick={releaseSelected}>{text.releaseSelected}</Button>
+              <Button tone="primary" data-e2e-action="wave-release-selected" disabled={!selected || mutation.status === 'running'} onClick={releaseSelected}>{text.releaseSelected}</Button>
             </PermissionGate>
           )}
         >
@@ -101,7 +101,7 @@ export function WavesPage() {
               </div>
               <ActionStatus mutation={mutation} />
               <PermissionGate permission="wave.manage">
-                <Button tone="primary" data-mcp-action="wave-release-and-create" disabled={mutation.status === 'running'} onClick={releaseSelected}>{text.releaseAndCreate}</Button>
+                <Button tone="primary" data-e2e-action="wave-release-and-create" disabled={mutation.status === 'running'} onClick={releaseSelected}>{text.releaseAndCreate}</Button>
               </PermissionGate>
             </div>
           )}

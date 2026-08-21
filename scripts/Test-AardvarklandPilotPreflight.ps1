@@ -62,8 +62,7 @@ foreach ($path in @(
   'backend\package.json',
   'backend\prisma\schema.prisma',
   'frontend\package.json',
-  'print-agent\package.json',
-  'MCP\package.json'
+  'print-agent\package.json'
 )) {
   $resolved = Join-Path $root $path
   Add-Check "file:$path" (Test-Path -LiteralPath $resolved) $resolved

@@ -63,7 +63,7 @@ a multi-printer obsluhu je doplnena.
   existuje.
 - Produkcni hardening pridal produkcni compose example, generator secretu,
   validaci zakazanych placeholder secretu, CSP/security headers, lockfile pro
-  `MCP` a `print-agent`, ciste dependency audity a Windows on-prem runbook.
+  `print-agent`, ciste dependency audity a Windows on-prem runbook.
 - Frontend build bezi na Vite 8, `config.js` je `type="module"` a drivejsi
   chunk/config warning se v produkcnim buildu neobjevuje.
 
@@ -75,8 +75,8 @@ a multi-printer obsluhu je doplnena.
    print-agent na pilotnim stroji.
 3. Monitoring dashboard a alerty: API, DB, queue, print agents, failed jobs,
    outbox age a backup age.
-4. Spustit 30min MCP provozni test: 1 vedouci + 10 skladniku, RF scan flow,
-   hardware sim lab, fake TCP 9100 tisk, vice tiskaren, retry/failover.
+4. Spustit 30min provozni test: 1 vedouci + 10 skladniku, RF scan flow,
+   fake TCP 9100 tisk, vice tiskaren, retry/failover.
 5. RF cycle-count workflow dotahnout primo do scanner-first obrazovky, pokud se
    bude v pilotu pocitat fyzicky pres handheld.
 6. Fyzicky hardware acceptance: vytisknout ZPL stitek, naskenovat ho zpet do WMS.
