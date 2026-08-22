@@ -1,0 +1,197 @@
+services:
+  postgres:
+    image: postgres:18-alpine
+    container_name: aardvarkland-storage-postgres-prod
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-aardvarkland}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set a generated POSTGRES_PASSWORD before production start}
+      POSTGRES_DB: ${POSTGRES_DB:-aardvarkland_storage}
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - aardvarkland-storage-postgres-prod-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-aardvarkland} -d ${POSTGRES_DB:-aardvarkland_storage}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  database-init:
+    build:
+      context: ./backend
+      target: database-init
+    container_name: aardvarkland-storage-database-init-prod
+    restart: "no"
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: ${DATABASE_URL:?Set DATABASE_URL with a generated database password}
+      ADMIN_INITIAL_PASSWORD: ${ADMIN_INITIAL_PASSWORD:?Set a strong initial administrator password}
+      ALLOW_DEMO_SEED: "true"
+      SEED_LOCAL_DEMO_USERS: "false"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  backend:
+    build:
+      context: ./backend
+    container_name: aardvarkland-storage-backend-prod
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 4001
+      DATABASE_URL: ${DATABASE_URL:?Set DATABASE_URL with a generated database password}
+      DATABASE_POOL_MAX: ${DATABASE_POOL_MAX:-20}
+      DATABASE_STATEMENT_TIMEOUT_MS: ${DATABASE_STATEMENT_TIMEOUT_MS:-60000}
+      DATABASE_LOCK_TIMEOUT_MS: ${DATABASE_LOCK_TIMEOUT_MS:-10000}
+      REQUEST_BODY_LIMIT: ${REQUEST_BODY_LIMIT:-1mb}
+      JWT_SECRET: ${JWT_SECRET:?Set a generated JWT_SECRET}
+      JWT_KEY_ID: ${JWT_KEY_ID:-jwt-production-v1}
+      JWT_PREVIOUS_SECRETS: ${JWT_PREVIOUS_SECRETS:-}
+      JWT_ISSUER: ${JWT_ISSUER:-aardvarkland-storage-system}
+      JWT_AUDIENCE: ${JWT_AUDIENCE:-aardvarkland-storage-system-api}
+      JWT_ACCESS_TOKEN_TTL_SECONDS: ${JWT_ACCESS_TOKEN_TTL_SECONDS:-900}
+      JWT_REFRESH_TOKEN_TTL_SECONDS: ${JWT_REFRESH_TOKEN_TTL_SECONDS:-2592000}
+      WEBHOOK_SHARED_SECRET: ${WEBHOOK_SHARED_SECRET:?Set a generated WEBHOOK_SHARED_SECRET}
+      WEBHOOK_SIGNATURE_TOLERANCE_SECONDS: ${WEBHOOK_SIGNATURE_TOLERANCE_SECONDS:-300}
+      CARRIER_CREDENTIAL_ENCRYPTION_KEY: ${CARRIER_CREDENTIAL_ENCRYPTION_KEY:?Set a generated carrier encryption key}
+      CARRIER_CREDENTIAL_ENCRYPTION_KEY_ID: ${CARRIER_CREDENTIAL_ENCRYPTION_KEY_ID:-carrier-production-v1}
+      CARRIER_CREDENTIAL_PREVIOUS_ENCRYPTION_KEYS: ${CARRIER_CREDENTIAL_PREVIOUS_ENCRYPTION_KEYS:-}
+      CARRIER_ADAPTER_MODE: ${CARRIER_ADAPTER_MODE:-credential}
+      CARRIER_HTTP_TIMEOUT_MS: ${CARRIER_HTTP_TIMEOUT_MS:-15000}
+      MFA_TOTP_ISSUER: ${MFA_TOTP_ISSUER:-Aardvarkland Storage System}
+      MFA_SECRET_ENCRYPTION_KEY: ${MFA_SECRET_ENCRYPTION_KEY:?Set a generated MFA encryption key}
+      MFA_SECRET_ENCRYPTION_KEY_ID: ${MFA_SECRET_ENCRYPTION_KEY_ID:-storage-system-mfa-v1}
+      MFA_PREVIOUS_SECRET_ENCRYPTION_KEYS: ${MFA_PREVIOUS_SECRET_ENCRYPTION_KEYS:-}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:?Set the frontend origin, for example http://localhost:4000}
+      SECURITY_HSTS_ENABLED: ${SECURITY_HSTS_ENABLED:-false}
+      ENABLE_SWAGGER: "false"
+      ENABLE_DEMO_ROUTES: "false"
+      RATE_LIMIT_BACKEND: postgres
+      RATE_LIMIT_FAIL_OPEN: "false"
+      RATE_LIMIT_MAX: ${RATE_LIMIT_MAX:-600}
+      RATE_LIMIT_AUTH_LOGIN_MAX: ${RATE_LIMIT_AUTH_LOGIN_MAX:-20}
+      RATE_LIMIT_AUTH_REFRESH_MAX: ${RATE_LIMIT_AUTH_REFRESH_MAX:-120}
+      RATE_LIMIT_WEBHOOK_MAX: ${RATE_LIMIT_WEBHOOK_MAX:-600}
+      TRUST_PROXY_HOPS: ${TRUST_PROXY_HOPS:-0}
+      HEALTH_OUTBOX_MAX_AGE_SECONDS: ${HEALTH_OUTBOX_MAX_AGE_SECONDS:-300}
+      HEALTH_QUEUE_WORKER_MAX_AGE_SECONDS: ${HEALTH_QUEUE_WORKER_MAX_AGE_SECONDS:-300}
+      HEALTH_REQUIRE_QUEUE_WORKER: "true"
+      WMS_BACKUP_STATUS_PATH: ${WMS_BACKUP_STATUS_PATH:-/app/.runtime/backup-status.json}
+      HEALTH_BACKUP_MAX_AGE_SECONDS: ${HEALTH_BACKUP_MAX_AGE_SECONDS:-108000}
+      HEALTH_REQUIRE_BACKUP_STATUS: ${HEALTH_REQUIRE_BACKUP_STATUS:-true}
+      HEALTH_RESTORE_DRILL_MAX_AGE_SECONDS: ${HEALTH_RESTORE_DRILL_MAX_AGE_SECONDS:-604800}
+      HEALTH_REQUIRE_RESTORE_DRILL: ${HEALTH_REQUIRE_RESTORE_DRILL:-true}
+      EXTERNAL_HTTP_ALLOWED_HOSTS: ${EXTERNAL_HTTP_ALLOWED_HOSTS:-}
+      AUTH_FAILED_LOGIN_BACKOFF_ENABLED: "true"
+      AUTH_FAILED_LOGIN_BACKOFF_THRESHOLD: ${AUTH_FAILED_LOGIN_BACKOFF_THRESHOLD:-5}
+      AUTH_FAILED_LOGIN_BACKOFF_BASE_SECONDS: ${AUTH_FAILED_LOGIN_BACKOFF_BASE_SECONDS:-30}
+      AUTH_FAILED_LOGIN_BACKOFF_MAX_SECONDS: ${AUTH_FAILED_LOGIN_BACKOFF_MAX_SECONDS:-900}
+      AUTH_FAILED_LOGIN_BACKOFF_WINDOW_SECONDS: ${AUTH_FAILED_LOGIN_BACKOFF_WINDOW_SECONDS:-900}
+      STRUCTURED_LOGS_ENABLED: ${STRUCTURED_LOGS_ENABLED:-true}
+      INTEGRATION_CIRCUIT_BREAKER_ENABLED: ${INTEGRATION_CIRCUIT_BREAKER_ENABLED:-true}
+      INTEGRATION_CIRCUIT_BREAKER_FAILURE_THRESHOLD: ${INTEGRATION_CIRCUIT_BREAKER_FAILURE_THRESHOLD:-5}
+      INTEGRATION_CIRCUIT_BREAKER_COOLDOWN_SECONDS: ${INTEGRATION_CIRCUIT_BREAKER_COOLDOWN_SECONDS:-300}
+    volumes:
+      - ./backend/.runtime:/app/.runtime:ro
+    ports:
+      - "127.0.0.1:${BACKEND_PORT:-4001}:4001"
+    depends_on:
+      database-init:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"fetch('http://127.0.0.1:4001/api/health/ready').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  queue-worker:
+    build:
+      context: ./backend
+    container_name: aardvarkland-storage-queue-worker-prod
+    restart: unless-stopped
+    command: ["npm", "run", "start:queue"]
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: ${DATABASE_URL:?Set DATABASE_URL with a generated database password}
+      DATABASE_POOL_MAX: ${QUEUE_WORKER_DATABASE_POOL_MAX:-10}
+      DATABASE_STATEMENT_TIMEOUT_MS: ${DATABASE_STATEMENT_TIMEOUT_MS:-60000}
+      DATABASE_LOCK_TIMEOUT_MS: ${DATABASE_LOCK_TIMEOUT_MS:-10000}
+      REQUEST_BODY_LIMIT: ${REQUEST_BODY_LIMIT:-1mb}
+      JWT_SECRET: ${JWT_SECRET:?Set a generated JWT_SECRET}
+      JWT_KEY_ID: ${JWT_KEY_ID:-jwt-production-v1}
+      JWT_PREVIOUS_SECRETS: ${JWT_PREVIOUS_SECRETS:-}
+      JWT_ISSUER: ${JWT_ISSUER:-aardvarkland-storage-system}
+      JWT_AUDIENCE: ${JWT_AUDIENCE:-aardvarkland-storage-system-api}
+      JWT_ACCESS_TOKEN_TTL_SECONDS: ${JWT_ACCESS_TOKEN_TTL_SECONDS:-900}
+      JWT_REFRESH_TOKEN_TTL_SECONDS: ${JWT_REFRESH_TOKEN_TTL_SECONDS:-2592000}
+      WEBHOOK_SHARED_SECRET: ${WEBHOOK_SHARED_SECRET:?Set a generated WEBHOOK_SHARED_SECRET}
+      WEBHOOK_SIGNATURE_TOLERANCE_SECONDS: ${WEBHOOK_SIGNATURE_TOLERANCE_SECONDS:-300}
+      CARRIER_CREDENTIAL_ENCRYPTION_KEY: ${CARRIER_CREDENTIAL_ENCRYPTION_KEY:?Set a generated carrier encryption key}
+      CARRIER_CREDENTIAL_ENCRYPTION_KEY_ID: ${CARRIER_CREDENTIAL_ENCRYPTION_KEY_ID:-carrier-production-v1}
+      CARRIER_CREDENTIAL_PREVIOUS_ENCRYPTION_KEYS: ${CARRIER_CREDENTIAL_PREVIOUS_ENCRYPTION_KEYS:-}
+      CARRIER_ADAPTER_MODE: ${CARRIER_ADAPTER_MODE:-credential}
+      CARRIER_HTTP_TIMEOUT_MS: ${CARRIER_HTTP_TIMEOUT_MS:-15000}
+      MFA_TOTP_ISSUER: ${MFA_TOTP_ISSUER:-Aardvarkland Storage System}
+      MFA_SECRET_ENCRYPTION_KEY: ${MFA_SECRET_ENCRYPTION_KEY:?Set a generated MFA encryption key}
+      MFA_SECRET_ENCRYPTION_KEY_ID: ${MFA_SECRET_ENCRYPTION_KEY_ID:-storage-system-mfa-v1}
+      MFA_PREVIOUS_SECRET_ENCRYPTION_KEYS: ${MFA_PREVIOUS_SECRET_ENCRYPTION_KEYS:-}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:?Set the frontend origin, for example http://localhost:4000}
+      SECURITY_HSTS_ENABLED: ${SECURITY_HSTS_ENABLED:-false}
+      ENABLE_SWAGGER: "false"
+      ENABLE_DEMO_ROUTES: "false"
+      RATE_LIMIT_BACKEND: postgres
+      RATE_LIMIT_FAIL_OPEN: "false"
+      RATE_LIMIT_MAX: ${RATE_LIMIT_MAX:-600}
+      RATE_LIMIT_AUTH_LOGIN_MAX: ${RATE_LIMIT_AUTH_LOGIN_MAX:-20}
+      RATE_LIMIT_AUTH_REFRESH_MAX: ${RATE_LIMIT_AUTH_REFRESH_MAX:-120}
+      RATE_LIMIT_WEBHOOK_MAX: ${RATE_LIMIT_WEBHOOK_MAX:-600}
+      TRUST_PROXY_HOPS: ${TRUST_PROXY_HOPS:-0}
+      HEALTH_OUTBOX_MAX_AGE_SECONDS: ${HEALTH_OUTBOX_MAX_AGE_SECONDS:-300}
+      HEALTH_QUEUE_WORKER_MAX_AGE_SECONDS: ${HEALTH_QUEUE_WORKER_MAX_AGE_SECONDS:-300}
+      HEALTH_REQUIRE_QUEUE_WORKER: "true"
+      EXTERNAL_HTTP_ALLOWED_HOSTS: ${EXTERNAL_HTTP_ALLOWED_HOSTS:-}
+      AUTH_FAILED_LOGIN_BACKOFF_ENABLED: "true"
+      AUTH_FAILED_LOGIN_BACKOFF_THRESHOLD: ${AUTH_FAILED_LOGIN_BACKOFF_THRESHOLD:-5}
+      AUTH_FAILED_LOGIN_BACKOFF_BASE_SECONDS: ${AUTH_FAILED_LOGIN_BACKOFF_BASE_SECONDS:-30}
+      AUTH_FAILED_LOGIN_BACKOFF_MAX_SECONDS: ${AUTH_FAILED_LOGIN_BACKOFF_MAX_SECONDS:-900}
+      AUTH_FAILED_LOGIN_BACKOFF_WINDOW_SECONDS: ${AUTH_FAILED_LOGIN_BACKOFF_WINDOW_SECONDS:-900}
+      STRUCTURED_LOGS_ENABLED: ${STRUCTURED_LOGS_ENABLED:-true}
+      INTEGRATION_CIRCUIT_BREAKER_ENABLED: ${INTEGRATION_CIRCUIT_BREAKER_ENABLED:-true}
+      INTEGRATION_CIRCUIT_BREAKER_FAILURE_THRESHOLD: ${INTEGRATION_CIRCUIT_BREAKER_FAILURE_THRESHOLD:-5}
+      INTEGRATION_CIRCUIT_BREAKER_COOLDOWN_SECONDS: ${INTEGRATION_CIRCUIT_BREAKER_COOLDOWN_SECONDS:-300}
+      WMS_QUEUE_WORKER_ID: ${WMS_QUEUE_WORKER_ID:-prod-queue-worker}
+      WMS_QUEUE_WORKER_POLL_INTERVAL_MS: ${WMS_QUEUE_WORKER_POLL_INTERVAL_MS:-5000}
+    depends_on:
+      database-init:
+        condition: service_completed_successfully
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: aardvarkland-storage-frontend-prod
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      API_BASE_URL: ${FRONTEND_API_BASE_URL:-http://localhost:4001/api}
+      VITE_API_BASE_URL: ${FRONTEND_API_BASE_URL:-http://localhost:4001/api}
+      ENABLE_MOCKS: "false"
+      ENABLE_DEMO_MODE: "false"
+      DEFAULT_WAREHOUSE_ID: ${DEFAULT_WAREHOUSE_ID:-MAIN}
+    ports:
+      - "127.0.0.1:${FRONTEND_PORT:-4000}:4000"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"fetch('http://127.0.0.1:4000/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+volumes:
+  aardvarkland-storage-postgres-prod-data:
