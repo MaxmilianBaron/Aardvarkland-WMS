@@ -1,0 +1,44 @@
+name: Clean integrated branches
+on:
+  pull_request:
+    types: [closed]
+permissions:
+  contents: write
+jobs:
+  cleanup:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Delete only an integrated, unchanged work branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+        shell: python
+        run: |
+          import json, os, urllib.request, urllib.parse, urllib.error
+          event = json.load(open(os.environ['GITHUB_EVENT_PATH']))
+          pr = event['pull_request']
+          branch = pr['head']['ref']
+          if not branch.startswith(('fix/', 'test/')) or branch == pr['base']['ref']:
+              raise SystemExit(0)
+          base = 'https://api.github.com/repos/' + os.environ['REPOSITORY']
+          def api(path, method='GET'):
+              request = urllib.request.Request(base + path, method=method, headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
+              try:
+                  with urllib.request.urlopen(request) as response:
+                      data = response.read()
+                      return json.loads(data) if data else None
+              except urllib.error.HTTPError as error:
+                  if error.code == 404: return None
+                  raise
+          ref_path = '/git/ref/heads/' + urllib.parse.quote(branch, safe='')
+          current = api(ref_path)
+          if not current or current['object']['sha'] != pr['head']['sha']:
+              raise SystemExit(0)
+          head = api('/git/commits/' + pr['head']['sha'])
+          main_ref = api('/git/ref/heads/' + urllib.parse.quote(pr['base']['ref'], safe=''))
+          main = api('/git/commits/' + main_ref['object']['sha'])
+          if pr.get('merged') or head['tree']['sha'] == main['tree']['sha']:
+              api('/git/refs/heads/' + urllib.parse.quote(branch, safe=''), 'DELETE')
+              print('Integrated branch removed.')

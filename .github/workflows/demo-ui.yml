@@ -2,34 +2,38 @@ name: Demo UI
 
 on:
   pull_request:
-    paths: ['demo/**', '.github/workflows/demo-ui.yml']
+    paths: ['demo/**', 'frontend/**', '.github/workflows/demo-ui.yml']
+  push:
+    branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: read
 
+concurrency:
+  group: wms-ui-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   smoke:
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444
         with:
           node-version: 24.15.0
+      - run: npm ci --prefix frontend
+      - run: npm run build --prefix frontend
+      - run: npm ci --prefix demo --ignore-scripts
+      - run: node demo/node_modules/@playwright/test/cli.js install --with-deps chromium
       - working-directory: demo
-        run: node scripts/build-pages-artifact.mjs
-      - run: npm install --no-save --package-lock=false @playwright/test@1.55.0
-      - run: npx playwright install --with-deps chromium
-      - name: Start demo
-        run: |
-          python3 -m http.server 4173 --directory demo/_site --bind 127.0.0.1 > /tmp/wms-demo.log 2>&1 &
-          for attempt in {1..30}; do
-            curl --fail --silent http://127.0.0.1:4173/ > /dev/null && exit 0
-            sleep 1
-          done
-          cat /tmp/wms-demo.log
-          exit 1
-      - name: Run UI tests
-        env:
-          PREVIEW_URL: http://127.0.0.1:4173/
-        run: npx playwright test demo/e2e/preview.spec.mjs --workers=1 --reporter=line
+        run: node scripts/build-pages-artifact.mjs && node scripts/verify-ui.mjs
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: wms-ui-screenshots
+          path: demo/artifacts/ui
+          retention-days: 7
