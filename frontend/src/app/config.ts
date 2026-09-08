@@ -26,13 +26,13 @@ function readPositiveInt(value: number | string | undefined, fallback: number): 
 
 function normalizeApiBaseUrl(value: string): string {
   const trimmed = value.trim().replace(/\/+$/, '');
-  const safe = trimmed || 'http://localhost:4001/api';
+  const safe = trimmed || '/api';
   return safe.endsWith('/api') || safe.endsWith('/api/v1') ? safe : `${safe}/api`;
 }
 
 const runtime = typeof window !== 'undefined' ? window.__AARDVARKLAND_STORAGE_SYSTEM_CONFIG__ ?? {} : {};
 const viteEnableMocks = String(import.meta.env.VITE_ENABLE_MOCKS ?? 'false').toLowerCase() === 'true';
-const defaultApiBaseUrl = runtime.apiBaseUrl ?? import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:4001/api';
+const defaultApiBaseUrl = runtime.apiBaseUrl ?? import.meta.env.VITE_API_BASE_URL ?? '/api';
 const defaultTimeoutMs = Number.parseInt(String(import.meta.env.VITE_API_REQUEST_TIMEOUT_MS ?? '12000'), 10);
 
 export const config = {

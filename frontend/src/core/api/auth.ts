@@ -1,4 +1,4 @@
-import { apiRequest } from './http';
+import { ApiError, apiRequest } from './http';
 import { config } from '../../app/config';
 import { clearTokens, getAccessToken, getRefreshToken, saveTokens } from '../auth/session';
 
@@ -71,7 +71,13 @@ export async function login(input: LoginInput) {
     method: 'POST',
     body: input,
   });
-  if (result.accessToken) saveTokens(result);
+  if (result?.requiresMfa || result?.mfaRequired) {
+    throw new ApiError('MFA code is required.', 401, { error: { code: 'MFA_CODE_REQUIRED' } });
+  }
+  if (!result || typeof result.accessToken !== 'string' || !result.accessToken.trim()) {
+    throw new ApiError('Invalid login response.', 502, null);
+  }
+  saveTokens(result);
   return result;
 }
 
@@ -120,6 +126,7 @@ export async function updateWorkContext(input: UpdateWorkContextInput) {
 export async function logout() {
   const accessToken = getAccessToken();
   const refreshToken = getRefreshToken();
+  clearTokens();
 
   try {
     if (refreshToken) {
@@ -134,8 +141,6 @@ export async function logout() {
     }
   } catch {
     // Local logout must still finish even if the network is already gone.
-  } finally {
-    clearTokens();
   }
 }
 
@@ -169,6 +174,9 @@ async function readPayload<T>(response: Response): Promise<T | null> {
 
 async function revokeRefreshToken(accessToken: string, refreshToken: string): Promise<boolean> {
   const response = await fetch(joinApiPath('/auth/revoke'), {
+    signal: AbortSignal.timeout(config.apiRequestTimeoutMs),
+    cache: 'no-store',
+    redirect: 'error',
     method: 'POST',
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -183,6 +191,9 @@ async function revokeRefreshToken(accessToken: string, refreshToken: string): Pr
 
 async function refreshForLogout(refreshToken: string): Promise<LoginResponse | null> {
   const response = await fetch(joinApiPath('/auth/refresh'), {
+    signal: AbortSignal.timeout(config.apiRequestTimeoutMs),
+    cache: 'no-store',
+    redirect: 'error',
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

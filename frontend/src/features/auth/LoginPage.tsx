@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, useEffect, useRef, useState } from 'react';
 import { login } from '../../core/api/auth';
 import { ApiError } from '../../core/api/http';
 import { Button } from '../../components/ui/Button';
@@ -87,6 +87,7 @@ export function LoginPage({ onLogin }: { onLogin: () => void }) {
   const [language, setLanguage] = useState<LoginLanguage>(getInitialLanguage);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const submitting = useRef(false);
   const text = pickLanguage(language, loginCopy);
 
   useEffect(() => {
@@ -98,6 +99,8 @@ export function LoginPage({ onLogin }: { onLogin: () => void }) {
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
+    if (submitting.current) return;
+    submitting.current = true;
     setLoading(true);
     setErrorMessage(null);
     try {
@@ -116,6 +119,7 @@ export function LoginPage({ onLogin }: { onLogin: () => void }) {
         setErrorMessage(mfaRequired ? text.mfaError : text.error);
       }
     } finally {
+      submitting.current = false;
       setLoading(false);
     }
   };
@@ -134,7 +138,7 @@ export function LoginPage({ onLogin }: { onLogin: () => void }) {
             <span className="login-brand__tagline">{text.tagline}</span>
           </h1>
         </div>
-        <form className="login-form" onSubmit={submit} autoComplete="off">
+        <form className="login-form" onSubmit={submit} autoComplete="on" aria-busy={loading}>
           <div className="login-form__header">
             <h2>{text.title}</h2>
             <p>{text.subtitle}</p>
@@ -147,8 +151,10 @@ export function LoginPage({ onLogin }: { onLogin: () => void }) {
                   value={loginName}
                   onChange={(event) => setLoginName(event.target.value)}
                   type="text"
-                  autoComplete="off"
-                  name="aardvarkland-login-name"
+                  autoComplete="username"
+                  name="username"
+                  autoCapitalize="none" autoCorrect="off" spellCheck={false}
+                  maxLength={254} disabled={loading}
                   required
                 />
               </label>
@@ -158,8 +164,9 @@ export function LoginPage({ onLogin }: { onLogin: () => void }) {
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
                   type="password"
-                  autoComplete="off"
-                  name="aardvarkland-login-password"
+                  autoComplete="current-password"
+                  name="current-password"
+                  maxLength={128} disabled={loading}
                   required
                 />
               </label>
@@ -174,7 +181,8 @@ export function LoginPage({ onLogin }: { onLogin: () => void }) {
                   type="text"
                   inputMode="numeric"
                   autoComplete="one-time-code"
-                  name="aardvarkland-mfa-code"
+                  name="one-time-code"
+                  maxLength={6} pattern="[0-9]{6}" disabled={loading}
                   aria-describedby="login-mfa-hint"
                   required
                   autoFocus
@@ -184,6 +192,7 @@ export function LoginPage({ onLogin }: { onLogin: () => void }) {
               <button
                 className="link-button"
                 type="button"
+                disabled={loading}
                 onClick={() => {
                   setMfaRequired(false);
                   setMfaCode('');

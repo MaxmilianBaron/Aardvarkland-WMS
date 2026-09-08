@@ -32,10 +32,12 @@ export default defineConfig({
     host: '0.0.0.0',
     port: 4000,
     strictPort: true,
+    proxy: { '/api': { target: process.env.BACKEND_ORIGIN || 'http://127.0.0.1:4001' } },
   },
   preview: {
     host: '0.0.0.0',
     port: 4000,
     strictPort: true,
+    proxy: { '/api': { target: process.env.BACKEND_ORIGIN || 'http://127.0.0.1:4001' } },
   },
 });

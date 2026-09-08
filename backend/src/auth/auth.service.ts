@@ -183,6 +183,17 @@ export class AuthService {
 
     const rotated = await this.prisma.$transaction(async (tx: unknown) => {
       const client = tx as PrismaRawClient;
+      // All rotations and revocations acquire the user row before session rows.
+      // This also serializes against password changes that update the user first.
+      const owners = await client.$queryRawUnsafe<Array<{ user_id: string }>>(
+        'SELECT user_id FROM refresh_token_sessions WHERE token_hash = $1', tokenHash,
+      );
+      const owner = owners[0];
+      if (!owner) return null;
+      const users = await client.$queryRawUnsafe<Array<{ status: string }>>(
+        'SELECT status FROM users WHERE id = $1::uuid FOR NO KEY UPDATE', owner.user_id,
+      );
+      if (users[0]?.status !== 'ACTIVE') return null;
       const rows = await client.$queryRawUnsafe<RefreshSessionRow[]>(
         `
           SELECT id, user_id, family_id, status, expires_at
@@ -201,7 +212,7 @@ export class AuthService {
           ipAddress: metadata.ipAddress ?? null,
           userAgent: metadata.userAgent ?? null,
         });
-        throw new UnauthorizedException('Invalid refresh token');
+        return null;
       }
 
       if (session.status !== 'ACTIVE' || toDate(session.expires_at).getTime() <= Date.now()) {
@@ -216,7 +227,7 @@ export class AuthService {
           ipAddress: metadata.ipAddress ?? null,
           userAgent: metadata.userAgent ?? null,
         });
-        throw new UnauthorizedException('Invalid refresh token');
+        return null;
       }
 
       const inserted = await client.$queryRawUnsafe<CreatedRefreshSessionRow[]>(
@@ -253,6 +264,8 @@ export class AuthService {
       return { userId: session.user_id, refreshToken: replacementRefreshToken, refreshExpiresAt: toDate(created.expires_at) };
     });
 
+    if (!rotated) throw new UnauthorizedException('Invalid refresh token');
+
     const user = await this.usersService.findUserWithAccessById(rotated.userId);
     if (!user || user.status !== UserStatus.ACTIVE) {
       await this.writeSecurityAudit(rotated.userId, 'auth.refresh_failed', {
@@ -278,26 +291,30 @@ export class AuthService {
     user: AuthenticatedUser,
     dto: RevokeRefreshTokenDto,
   ): Promise<{ revoked: true; scope: 'single' | 'all' }> {
-    if (dto.revokeAll) {
-      await this.prisma.$executeRawUnsafe(
-        `UPDATE refresh_token_sessions SET status = 'REVOKED', revoked_at = NOW(), updated_at = NOW() WHERE user_id = $1::uuid AND status = 'ACTIVE'`,
-        user.id,
-      );
-      await this.writeSecurityAudit(user.id, 'auth.refresh_token_revoked', { scope: 'all' });
-      return { revoked: true, scope: 'all' };
-    }
-
-    if (!dto.refreshToken) {
+    if (!dto.revokeAll && !dto.refreshToken) {
       throw new BadRequestException('refreshToken is required unless revokeAll is true');
     }
-
-    await this.prisma.$executeRawUnsafe(
-      `UPDATE refresh_token_sessions SET status = 'REVOKED', revoked_at = NOW(), updated_at = NOW() WHERE user_id = $1::uuid AND token_hash = $2 AND status = 'ACTIVE'`,
-      user.id,
-      hashRefreshToken(dto.refreshToken),
-    );
-    await this.writeSecurityAudit(user.id, 'auth.refresh_token_revoked', { scope: 'single' });
-    return { revoked: true, scope: 'single' };
+    await this.prisma.$transaction(async (tx: unknown) => {
+      const client = tx as PrismaRawClient;
+      await client.$queryRawUnsafe('SELECT id FROM users WHERE id = $1::uuid FOR NO KEY UPDATE', user.id);
+      if (dto.revokeAll) {
+        await client.$executeRawUnsafe(
+          `UPDATE refresh_token_sessions SET status = 'REVOKED', revoked_at = NOW(), updated_at = NOW()
+           WHERE user_id = $1::uuid AND status = 'ACTIVE'`, user.id,
+        );
+      } else {
+        // A logout racing a rotation must revoke the successor, not only its old token.
+        await client.$executeRawUnsafe(
+          `UPDATE refresh_token_sessions SET status = 'REVOKED', revoked_at = NOW(), updated_at = NOW()
+           WHERE user_id = $1::uuid AND status = 'ACTIVE' AND family_id IN
+             (SELECT family_id FROM refresh_token_sessions WHERE user_id = $1::uuid AND token_hash = $2)`,
+          user.id, hashRefreshToken(dto.refreshToken!),
+        );
+      }
+    });
+    const scope = dto.revokeAll ? 'all' : 'single';
+    await this.writeSecurityAudit(user.id, 'auth.refresh_token_revoked', { scope });
+    return { revoked: true, scope };
   }
 
   async getMfaStatus(user: AuthenticatedUser): Promise<MfaStatusResponse> {

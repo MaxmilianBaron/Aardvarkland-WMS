@@ -12,5 +12,6 @@ COPY package*.json ./
 RUN npm ci --omit=dev
 COPY --from=build /app/dist ./dist
 COPY server.js ./server.js
+USER node
 EXPOSE 4000
 CMD ["node", "server.js"]

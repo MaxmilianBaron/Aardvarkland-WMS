@@ -1,5 +1,5 @@
 window.__AARDVARKLAND_STORAGE_SYSTEM_CONFIG__ = {
-  apiBaseUrl: 'http://localhost:4001/api',
+  apiBaseUrl: '/api',
   apiRequestTimeoutMs: 12000,
   enableMocks: false,
   defaultWarehouseId: 'MAIN',

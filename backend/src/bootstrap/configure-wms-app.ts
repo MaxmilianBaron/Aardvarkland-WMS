@@ -29,6 +29,10 @@ export function configureWmsApp(
   options: ConfigureWmsAppOptions = {},
 ): INestApplication {
   const config = app.get(ConfigService<Env, true>);
+  app.use((_request: unknown, response: { setHeader(name: string, value: string): void }, next: () => void) => {
+    response.setHeader('Cache-Control', 'no-store, private');
+    next();
+  });
   configureBodyParser(app, config.get('REQUEST_BODY_LIMIT', { infer: true }));
   const gracefulShutdown = app.get(GracefulShutdownService, { strict: false });
   app.use(gracefulShutdown.createMiddleware());
@@ -94,7 +98,9 @@ function configureBodyParser(app: INestApplication, limit: string): void {
   };
 
   expressApp.useBodyParser?.('json', { limit });
-  expressApp.useBodyParser?.('urlencoded', { extended: true, limit });
+  expressApp.useBodyParser?.('urlencoded', { extended: true,
+    parameterLimit: 1_000,
+    depth: 10, limit });
 }
 
 function configureTrustedProxy(app: INestApplication, trustProxyHops: number): void {

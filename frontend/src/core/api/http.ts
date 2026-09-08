@@ -100,29 +100,35 @@ async function parseResponsePayload(response: Response): Promise<unknown> {
 async function performAccessTokenRefresh(): Promise<boolean> {
   const refreshToken = getRefreshToken();
   if (!refreshToken) return false;
-
+  const abort = createTimeoutSignal(Math.max(1000, config.apiRequestTimeoutMs));
   try {
     const response = await fetch(joinApiPath('/auth/refresh'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'X-Request-ID': createRequestId() },
       body: JSON.stringify({ refreshToken }),
+      signal: abort.signal,
+      cache: 'no-store',
     });
-
     if (!response.ok) {
-      clearTokens();
-      return false;
+      if (response.status === 400 || response.status === 401 || response.status === 403) {
+        if (getRefreshToken() === refreshToken) clearTokens();
+        return false;
+      }
+      throw new ApiError('Session refresh is temporarily unavailable', response.status, null);
     }
-
     const data = unwrapPayload<{ accessToken?: string; refreshToken?: string; user?: unknown }>(await parseResponsePayload(response));
-    if (!data?.accessToken) {
-      clearTokens();
-      return false;
+    if (!data || typeof data.accessToken !== 'string' || !data.accessToken
+      || typeof data.refreshToken !== 'string' || !data.refreshToken) {
+      throw new ApiError('Invalid session refresh response', 502, null);
     }
-    saveTokens({ accessToken: data.accessToken, refreshToken: data.refreshToken ?? refreshToken, user: data.user });
+    if (getRefreshToken() !== refreshToken) return false;
+    saveTokens({ accessToken: data.accessToken, refreshToken: data.refreshToken, user: data.user });
     return true;
-  } catch {
-    clearTokens();
-    return false;
+  } catch (error) {
+    if (error instanceof ApiError) throw error;
+    throw new ApiError(abort.signal.aborted ? 'Session refresh timed out' : 'Session refresh is temporarily unavailable', 0, null);
+  } finally {
+    abort.cleanup();
   }
 }
 
@@ -162,25 +168,26 @@ export async function apiRequest<TResponse, TBody = unknown>(
       headers,
       body: options.body !== undefined ? JSON.stringify(options.body) : undefined,
       signal: abort.signal,
+      cache: 'no-store',
     });
 
   try {
     let response = await execute();
 
     if (response.status === 401) {
-      if (await refreshAccessToken()) {
+      const refreshed = getAccessToken() !== token && Boolean(getAccessToken())
+        ? true : await refreshAccessToken();
+      if (refreshed) {
         const nextToken = getAccessToken();
         if (nextToken) headers.Authorization = `Bearer ${nextToken}`;
         response = await execute();
-      } else {
-        clearTokens();
       }
     }
 
     const payload = await parseResponsePayload(response);
 
     if (!response.ok) {
-      if (response.status === 401) clearTokens();
+      if (response.status === 401 && getAccessToken() === headers.Authorization?.slice(7)) clearTokens();
       const message = extractErrorMessage(payload, response.statusText);
       reportApiFailure(path, message, response.status, startedAt);
       throw new ApiError(message, response.status, payload);
@@ -191,7 +198,7 @@ export async function apiRequest<TResponse, TBody = unknown>(
     if (error instanceof ApiError) throw error;
     const message = abort.signal.aborted ? `API timeout po ${timeout} ms` : error instanceof Error ? error.message : 'API request failed';
     reportApiFailure(path, message, 0, startedAt);
-    throw new ApiError(message, 0, { path, url });
+    throw new ApiError(message, 0, { path: path.split('?')[0] });
   } finally {
     abort.cleanup();
   }

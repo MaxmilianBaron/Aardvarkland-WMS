@@ -55,7 +55,13 @@ export class AllocationService {
         const client = tx as unknown;
         const warehouse = await this.resolveWarehouse(client, warehouseReference);
         const warehouseId = requireStringId(warehouse, 'Warehouse');
+        const candidate = await this.resolveOutboundOrder(client, warehouseId, orderReference);
+        // Lock the order before re-reading its lines and active reservations.
+        await lockPostgresRowById(client, 'outbound_orders', requireStringId(candidate, 'OutboundOrder'));
         const order = await this.resolveOutboundOrder(client, warehouseId, orderReference);
+        if (['CANCELLED', 'SHIPPED', 'CLOSED', 'COMPLETED'].includes(readString(order, 'status') ?? '')) {
+          throw new ConflictException('Outbound order cannot be allocated in its current status');
+        }
         const owner = await this.resolveAllocationOwner(client, warehouseId, order, dto.ownerClientReference);
 
         return this.allocateOrderInTransaction(client, warehouseId, order, dto, actor, owner);

@@ -24,5 +24,6 @@ RUN npm ci --omit=dev
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/prisma ./prisma
 COPY prisma.config.ts ./
+USER node
 EXPOSE 4001
 CMD ["node", "dist/main.js"]

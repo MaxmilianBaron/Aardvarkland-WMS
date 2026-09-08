@@ -92,8 +92,9 @@ export class FulfillmentService {
   ): Promise<ConfirmPickResponse> {
     return this.transaction(async (tx) => {
       const warehouse = await this.resolveWarehouse(tx, warehouseReference);
+      const candidateTask = await this.resolveWarehouseTask(tx, warehouse.id, taskReference);
+      const order = await this.resolvePickOrder(tx, warehouse.id, candidateTask, dto);
       const task = await this.resolveWarehouseTask(tx, warehouse.id, taskReference);
-      const order = await this.resolvePickOrder(tx, warehouse.id, task, dto);
       const owner = await this.resolveOrderOwner(tx, warehouse.id, order.id);
       this.assertActorCanAccessOwner(actor, owner, warehouse.id);
       this.assertCurrentStatus(order, FulfillmentStatus.PICKING);
@@ -358,7 +359,12 @@ export class FulfillmentService {
       throw new NotFoundException('Outbound order was not found');
     }
 
-    return order;
+    await lockPostgresRowById(client, 'outbound_orders', order.id);
+    const locked = await client.outboundOrder.findFirst({
+      where: orderReferenceWhere(warehouseId, order.id), include: outboundOrderInclude,
+    });
+    if (!locked) throw new NotFoundException('Outbound order was not found');
+    return locked;
   }
 
   private async resolvePickOrder(
@@ -451,7 +457,7 @@ export class FulfillmentService {
       throw new NotFoundException('Warehouse task was not found');
     }
 
-    if (task.status === 'DONE') {
+    if (task.status === 'DONE' || task.status === 'CANCELLED') {
       throw new ConflictException('Warehouse task is already done');
     }
 
@@ -937,6 +943,15 @@ export class FulfillmentService {
 
     if (!stockQuant) {
       throw new ConflictException('Stock quant is required to reduce stock for picking');
+    }
+
+    if (client.reservation && reservation) {
+      await lockPostgresRowById(client, 'reservations', reservation.id);
+      const current = await client.reservation.findFirst({ where: { id: reservation.id } });
+      if (!current || current.status !== 'ACTIVE' || current.quantity < quantity) {
+        throw new ConflictException('Reservation is no longer available for this pick');
+      }
+      reservation = current;
     }
 
     await lockPostgresRowById(client, 'stock_quants', stockQuant.id);

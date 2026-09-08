@@ -21,6 +21,7 @@ import {
   STOCK_EXPIRY_FIELDS,
   STOCK_QUANTITY_FIELDS,
   availableQuantity,
+  activeReservationWhere,
   modelReferenceWhere,
   normalizeSku,
   toRecord,
@@ -160,6 +161,25 @@ export class ReservationsService {
     actor: AuthenticatedUser,
   ): Promise<RuntimeRecord> {
     const warehouseId = requireStringId(warehouse, 'Warehouse');
+    const orderContext = await this.resolveOrderContext(client, warehouseId, dto);
+    if (orderContext.outboundOrderId) {
+      await lockPostgresRowById(client, 'outbound_orders', orderContext.outboundOrderId);
+      const order = await this.resolveOutboundOrder(client, warehouseId, orderContext.outboundOrderId);
+      if (['CANCELLED', 'SHIPPED', 'CLOSED', 'COMPLETED'].includes(readString(order, 'status') ?? '')) {
+        throw new ConflictException('Outbound order cannot be reserved in its current status');
+      }
+    }
+    if (orderContext.outboundOrderLineId) {
+      const line = await this.resolveOutboundOrderLine(client, warehouseId, orderContext.outboundOrderLineId);
+      const reservationFields = getModelFields(client, 'Reservation');
+      const lineField = firstField(reservationFields, ['outboundOrderLineId', 'orderLineId']);
+      const existing = lineField ? await getDelegate<RuntimeRecord>(client, 'reservation', 'Reservation').findMany({
+        where: { [lineField]: orderContext.outboundOrderLineId, ...activeReservationWhere(reservationFields) },
+      }) : [];
+      const reserved = existing.reduce((sum, row) => sum + (readNumber(row, 'quantity') ?? 0), 0);
+      const remaining = (readNumber(line, 'orderedQuantity') ?? 0) - (readNumber(line, 'pickedQuantity') ?? 0) - reserved;
+      if (dto.quantity > remaining) throw new ConflictException('Reservation exceeds remaining outbound line quantity');
+    }
     const stockQuant = await this.resolveStockQuant(client, warehouseId, dto.stockQuantReference);
     const stockQuantFields = getModelFields(client, 'StockQuant');
     const quantityReservedField = firstField(stockQuantFields, QUANTITY_RESERVED_FIELDS);
@@ -171,7 +191,6 @@ export class ReservationsService {
       );
     }
 
-    const orderContext = await this.resolveOrderContext(client, warehouseId, dto);
     const owner = await this.resolveReservationOwner(client, warehouseId, dto, stockQuant, orderContext);
     const reservedStock = await this.reserveStockQuant(
       client,
@@ -242,6 +261,8 @@ export class ReservationsService {
     const warehouseId = requireStringId(warehouse, 'Warehouse');
     const reservationCandidate = await this.resolveReservation(client, warehouseId, reservationReference);
     const reservationId = requireStringId(reservationCandidate, 'Reservation');
+    const orderId = readString(reservationCandidate, 'outboundOrderId');
+    if (orderId) await lockPostgresRowById(client, 'outbound_orders', orderId);
 
     // Serialize the complete reservation lifecycle before touching reserved stock.
     // A concurrent release/cancel must wait, reload the row, and observe the

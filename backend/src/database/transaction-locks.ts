@@ -54,7 +54,7 @@ export async function lockPostgresAdvisoryTransaction(
   }
 
   await client.$queryRawUnsafe(
-    'WITH locked AS (SELECT pg_advisory_xact_lock(hashtext($1), hashtext($2))) SELECT 1::int AS locked',
+    'WITH locked AS (SELECT pg_advisory_xact_lock(hashtext($1), hashtext($2))) SELECT 1::int AS locked FROM locked',
     namespace,
     key,
   );
