@@ -1,0 +1,109 @@
+name: Verify repair candidate
+on:
+  pull_request:
+    paths: ['.github/workflows/verify-candidate.yml', '.github/candidate.patch.*.b64']
+permissions:
+  contents: write
+concurrency:
+  group: verify-candidate-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify:
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'fix/data-session-ui'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    services:
+      regression-postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: regression-test-only
+          POSTGRES_DB: wms_regressions
+        ports: ['55432:5432']
+        options: --health-cmd "pg_isready -U postgres -d wms_regressions" --health-interval 5s --health-timeout 5s --health-retries 15
+    env:
+      DATABASE_URL: postgresql://postgres:regression-test-only@127.0.0.1:55432/wms_regressions
+      WMS_TEST_DATABASE_URL: postgresql://postgres:regression-test-only@127.0.0.1:55432/wms_regressions
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444
+        with:
+          node-version: 24.15.0
+      - name: Apply reviewed candidate
+        run: |
+          cat .github/candidate.patch.*.b64 | base64 --decode | xz --decompress --stdout > /tmp/candidate.patch
+          echo "62e6572315d31c2d9988034c190111c2678108c84f609eae306c85829e95cabc  /tmp/candidate.patch" | sha256sum --check
+          git apply --check /tmp/candidate.patch
+          git apply --index /tmp/candidate.patch
+      - name: Verify backend and transaction regressions
+        working-directory: backend
+        run: |
+          npm ci
+          npm run verify
+          npm run prisma:deploy
+          node --test scripts/transaction-regressions.test.mjs
+      - name: Verify product frontend
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run typecheck
+          npm run lint
+          npm run build
+          npm test
+      - name: Verify Print Agent
+        working-directory: print-agent
+        run: npm ci && npm run check
+      - name: Verify browser UI
+        run: |
+          npm ci --prefix demo --ignore-scripts
+          node demo/node_modules/@playwright/test/cli.js install --with-deps chromium
+          cd demo
+          node scripts/build-pages-artifact.mjs
+          node scripts/verify-ui.mjs
+      - name: Verify actual Docker deployment
+        run: |
+          unset DATABASE_URL
+          docker compose config --quiet
+          docker compose up --build --detach
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent --header 'Content-Type: application/json' --data '{"email":"admin@example.com","password":"Local-Seed-42!"}' http://127.0.0.1:4000/api/auth/login >/dev/null; then
+              break
+            fi
+            sleep 3
+          done
+          curl --fail --silent --header 'Content-Type: application/json' --data '{"email":"admin@example.com","password":"Local-Seed-42!"}' http://127.0.0.1:4000/api/auth/login >/dev/null
+          curl --fail --silent --head http://127.0.0.1:4001/api/health/ready | grep --ignore-case 'cache-control: no-store, private'
+          test "$(docker compose exec -T backend id -u)" != "0"
+          test "$(docker compose exec -T frontend id -u)" != "0"
+      - name: Docker diagnostics
+        if: failure()
+        run: docker compose ps && docker compose logs --tail 100
+      - name: Stop test deployment
+        if: always()
+        run: docker compose down --volumes
+      - name: Store the tested candidate on its work branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EXPECTED_HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          git diff --exit-code
+          git config user.name "Maxmilian Baron"
+          git config user.email "281639680+MaxmilianBaron@users.noreply.github.com"
+          git commit -m "Aardvarkland-WMS"
+          basic="$(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
+          echo "::add-mask::$basic"
+          git -c "http.https://github.com/.extraheader=AUTHORIZATION: basic $basic" push --force-with-lease="refs/heads/fix/data-session-ui:$EXPECTED_HEAD" "https://github.com/${GITHUB_REPOSITORY}.git" HEAD:refs/heads/fix/data-session-ui
+          mkdir -p /tmp/verified-candidate
+          git rev-parse HEAD > /tmp/verified-candidate/commit.txt
+          git rev-parse HEAD^{tree} > /tmp/verified-candidate/tree.txt
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: verified-candidate-evidence
+          path: |
+            /tmp/verified-candidate
+            demo/artifacts/ui
+          retention-days: 7
