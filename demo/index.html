@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Aardvarkland WMS product preview for warehouse operations, RF scanning, labels, integrations, and role-based workflows.">
+    <meta name="theme-color" content="#f6f7f8">
+    <title>Aardvarkland WMS Product Preview</title>
+    <link rel="icon" href="assets/logo.png">
+    <link rel="stylesheet" href="styles.css?v=production-closure-20260525">
+    <link rel="stylesheet" href="source-parity.css?v=source-parity-20260817">
+    <link rel="stylesheet" href="demo-login.css?v=source-parity-20260817">
+  </head>
+  <body>
+    <div class="app-shell shell">
+      <aside class="sidebar" aria-label="Main navigation">
+        <a class="brand legacy-brand" href="#" aria-label="Aardvarkland WMS Product Preview">
+          <img src="assets/logo.png" alt="" class="brand-logo">
+          <span><strong>Aardvarkland</strong><span id="brand-subtitle">warehouse management system</span></span>
+        </a>
+
+        <div class="sidebar__account" id="sidebar-account" aria-label="Signed-in demo account"></div>
+
+        <div class="mode-group legacy-role-switch" aria-label="Role">
+          <button class="mode-button is-active" data-role="worker" type="button">Warehouse worker</button>
+          <button class="mode-button" data-role="manager" type="button">Warehouse manager</button>
+          <button class="mode-button" data-role="admin" type="button">System administrator</button>
+        </div>
+
+        <nav class="nav-list nav" id="nav-list" aria-label="Main navigation"></nav>
+      </aside>
+
+      <main class="workspace main">
+        <header class="topbar topbar--minimal">
+          <div class="topbar-brand" aria-label="Aardvarkland WMS">
+            <span class="topbar-brand__mark"><img src="assets/logo.png" alt=""></span>
+            <span class="topbar-brand__copy">
+              <strong>Aardvarkland WMS</strong>
+              <span>Warehouse management system</span>
+            </span>
+          </div>
+
+          <div class="parity-route-meta" aria-hidden="true">
+            <p class="eyebrow" id="workspace-eyebrow">Main warehouse</p>
+            <h1 id="workspace-title">Operational overview</h1>
+          </div>
+
+          <div class="topbar-actions topbar__actions">
+            <div class="language-menu" aria-label="Choose language">
+              <button class="language-switch" id="language-toggle" data-action="language-menu-toggle" type="button" aria-label="Choose language" aria-expanded="false" aria-haspopup="menu" title="Choose language">
+                <span class="flag-icon" id="current-language-flag" aria-hidden="true"></span>
+              </button>
+              <div class="language-menu__list" id="language-list" role="menu" aria-label="Choose language" hidden>
+                <button class="language-menu__item" data-lang="cs" type="button" role="menuitemradio" aria-checked="false" aria-label="Czech" title="Czech"><span class="flag-icon" data-flag="cs" aria-hidden="true"></span></button>
+                <button class="language-menu__item is-active" data-lang="en" type="button" role="menuitemradio" aria-checked="true" aria-label="English" title="English"><span class="flag-icon" data-flag="en" aria-hidden="true"></span></button>
+                <button class="language-menu__item" data-lang="ua" type="button" role="menuitemradio" aria-checked="false" aria-label="Ukrainian" title="Ukrainian"><span class="flag-icon" data-flag="ua" aria-hidden="true"></span></button>
+              </div>
+            </div>
+            <button class="theme-toggle" id="theme-toggle" data-action="theme-toggle" type="button" aria-pressed="false" aria-label="Switch to dark mode" title="Switch to dark mode"><span id="theme-toggle-icon" aria-hidden="true"></span></button>
+            <button class="icon-button parity-sync-control" type="button" data-action="sync" aria-label="Refresh status" title="Refresh status">↻</button>
+          </div>
+        </header>
+
+        <section class="content">
+          <section class="status-strip app-status-strip" aria-label="Warehouse status">
+            <div><span class="status-dot status-dot--ok"></span><span id="api-status">API ready</span></div>
+            <div><span class="status-dot status-dot--warn"></span><span id="print-status">2 jobs waiting to print</span></div>
+            <div><span class="status-dot status-dot--ok"></span><span id="scan-status">RF scanners active</span></div>
+          </section>
+          <section class="view is-active" id="view-root"></section>
+        </section>
+
+        <nav class="mobile-tabbar" id="mobile-tabbar" aria-label="Mobile navigation"></nav>
+      </main>
+    </div>
+
+    <script src="app.js?v=production-closure-20260525"></script>
+    <script>
+      const previewLanguageNames = { cs: 'Czech', en: 'English', ua: 'Ukrainian' };
+      const normalizePreviewLanguageNames = () => {
+        document.querySelectorAll('[data-lang]').forEach((button) => {
+          const label = previewLanguageNames[button.dataset.lang];
+          if (!label) return;
+          if (button.getAttribute('aria-label') !== label) button.setAttribute('aria-label', label);
+          if (button.getAttribute('title') !== label) button.setAttribute('title', label);
+        });
+      };
+      document.querySelector('[data-lang="en"]')?.click();
+      normalizePreviewLanguageNames();
+      const languageList = document.getElementById('language-list');
+      if (languageList) new MutationObserver(normalizePreviewLanguageNames).observe(languageList, { attributes: true, subtree: true });
+    </script>
+    <script src="source-parity.js?v=source-parity-20260817"></script>
+    <script src="demo-login.js?v=source-parity-20260817"></script>
+  </body>
+</html>
