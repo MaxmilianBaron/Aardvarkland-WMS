@@ -1,0 +1,59 @@
+# Dependencies and generated output
+**/node_modules/
+**/dist/
+**/build/
+**/coverage/
+**/test-results/
+**/artifacts/
+backend/src/generated/prisma/
+_site/
+
+# Secrets and local configuration
+**/.env
+**/.env.*
+!**/.env.example
+!**/.env.production.example
+*.jks
+*.keystore
+*.p12
+*.pfx
+*.pem
+key.properties
+
+# Local data and logs
+*.db
+*.sqlite*
+*.dump
+*.bak
+*.log
+logs/
+reports/
+backups/
+
+# IDE and OS
+*.iml
+.DS_Store
+Thumbs.db
+
+# Public repository hygiene
+screenshots/
+device-captures/
+screenshot-*.png
+screen-capture-*.png
+feature-mobile.png
+ui-dump*.xml
+window-dump*.xml
+
+# Exclude local credentials, data and generated files from source archives
+*.jks
+*.keystore
+*.p12
+*.pfx
+key.properties
+*.db
+*.sqlite
+*.sqlite3
+**/node_modules/
+**/.dart_tool/
+**/.gradle/
+**/__pycache__/

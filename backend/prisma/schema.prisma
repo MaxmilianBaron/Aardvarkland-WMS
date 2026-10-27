@@ -1,0 +1,3282 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserStatus {
+  ACTIVE
+  DISABLED
+}
+
+enum WarehouseStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum WmsClientStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum BillingEventType {
+  STORAGE_DAY
+  INBOUND_RECEIPT
+  OUTBOUND_ORDER
+  PICK
+  PACK
+  SHIP
+  CARRIER_LABEL
+  CYCLE_COUNT
+  REPLENISHMENT
+  MANUAL
+}
+
+enum BillingEventStatus {
+  PENDING
+  BILLABLE
+  INVOICED
+  VOIDED
+}
+
+enum BillingInvoiceStatus {
+  DRAFT
+  FINALIZED
+  VOIDED
+}
+
+enum BillingCreditNoteStatus {
+  DRAFT
+  FINALIZED
+  VOIDED
+}
+
+enum BillingPeriodStatus {
+  OPEN
+  GENERATED
+  REVIEWED
+  CLOSED
+  REOPENED
+}
+
+enum SlottingRuleStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum SlottingRecommendationStatus {
+  OPEN
+  APPLIED
+  DISMISSED
+  EXPIRED
+}
+
+enum WarehouseLocationType {
+  RECEIVING
+  STORAGE
+  PICKING
+  PACKING
+  SHIPPING
+  BUFFER
+  QUARANTINE
+}
+
+enum ParcelStatus {
+  CREATED
+  RECEIVED
+  STORED
+  PICKING
+  PACKED
+  SHIPPED
+  EXCEPTION
+  CANCELLED
+}
+
+enum TrackingEventType {
+  CREATED
+  RECEIVED
+  STORED
+  MOVED
+  PICKED
+  PACKED
+  SHIPPED
+  SCANNED
+  EXCEPTION_RAISED
+  EXCEPTION_RESOLVED
+  CANCELLED
+}
+
+enum ExceptionStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+  CANCELLED
+}
+
+enum ExceptionSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum InboundStatus {
+  CREATED
+  EXPECTED
+  RECEIVING
+  RECEIVED
+  CLOSED
+  CANCELLED
+  EXCEPTION
+}
+
+enum OutboundStatus {
+  DRAFT
+  CREATED
+  ALLOCATED
+  PICKING
+  PICKED
+  PACKING
+  PACKED
+  SHIPPED
+  CANCELLED
+  EXCEPTION
+}
+
+enum ScannerStatus {
+  ACTIVE
+  INACTIVE
+  MAINTENANCE
+}
+
+enum LabelTemplateType {
+  PARCEL
+  LOCATION
+  CUSTOM
+}
+
+enum LabelJobStatus {
+  QUEUED
+  PRINTING
+  PRINTED
+  FAILED
+  CANCELLED
+}
+
+enum NotificationType {
+  INFO
+  WARNING
+  ERROR
+  TASK
+}
+
+enum NotificationStatus {
+  UNREAD
+  READ
+  ARCHIVED
+}
+
+enum IntegrationStatus {
+  ACTIVE
+  INACTIVE
+  ERROR
+}
+
+enum ProductStatus {
+  ACTIVE
+  BLOCKED
+  DISCONTINUED
+}
+
+enum SkuStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum StockQuantStatus {
+  AVAILABLE
+  RESERVED
+  BLOCKED
+  DAMAGED
+  IN_TRANSIT
+  QUARANTINE
+}
+
+enum StockMovementType {
+  RECEIVE
+  PUTAWAY
+  MOVE
+  RESERVE
+  PICK
+  PACK
+  SHIP
+  ADJUST
+  BLOCK
+  UNBLOCK
+  CANCEL_RESERVATION
+}
+
+enum ReservationStatus {
+  ACTIVE
+  PICKED
+  RELEASED
+  CANCELLED
+}
+
+enum HandlingUnitStatus {
+  OPEN
+  CLOSED
+  IN_TRANSIT
+  SHIPPED
+  DAMAGED
+}
+
+enum WarehouseTaskType {
+  RECEIVE
+  PUTAWAY
+  PICK
+  PACK
+  MOVE
+  REPLENISH
+  COUNT
+  LOAD
+}
+
+enum WarehouseTaskStatus {
+  OPEN
+  ASSIGNED
+  IN_PROGRESS
+  BLOCKED
+  DONE
+  FAILED
+  CANCELLED
+}
+
+enum IdempotencyStatus {
+  IN_PROGRESS
+  COMPLETED
+  FAILED
+}
+
+enum OutboxEventStatus {
+  PENDING
+  PROCESSING
+  SENT
+  FAILED
+  DEAD_LETTER
+}
+
+enum InboxEventStatus {
+  RECEIVED
+  PROCESSING
+  PROCESSED
+  FAILED
+  DUPLICATE
+  IGNORED
+}
+
+enum LotStatus {
+  ACTIVE
+  HOLD
+  QUARANTINED
+  RELEASED
+  EXPIRED
+  RECALLED
+  CONSUMED
+  ARCHIVED
+}
+
+enum LotQualityStatus {
+  RELEASED
+  PENDING_QA
+  HOLD
+  REJECTED
+}
+
+enum SerialNumberStatus {
+  EXPECTED
+  AVAILABLE
+  RESERVED
+  PICKED
+  PACKED
+  SHIPPED
+  BLOCKED
+  DAMAGED
+  RETURNED
+  SCRAPPED
+}
+
+enum WarehouseOrderType {
+  MOVE
+  PUTAWAY
+  PICK
+  REPLENISH
+  COUNT
+  LOAD
+  ADJUSTMENT
+}
+
+enum WarehouseOrderStatus {
+  DRAFT
+  RELEASED
+  IN_PROGRESS
+  PARTIALLY_COMPLETED
+  COMPLETED
+  CANCELLED
+  EXCEPTION
+}
+
+enum WarehouseOrderLineStatus {
+  OPEN
+  ALLOCATED
+  IN_PROGRESS
+  DONE
+  CANCELLED
+  EXCEPTION
+}
+
+enum RefreshTokenSessionStatus {
+  ACTIVE
+  ROTATED
+  REVOKED
+  EXPIRED
+  COMPROMISED
+}
+
+enum ScannerSessionStatus {
+  ACTIVE
+  COMPLETED
+  CANCELLED
+  EXPIRED
+}
+
+enum RfWorkflowType {
+  RECEIVE
+  PUTAWAY
+  PICK
+  PACK
+  MOVE
+  COUNT
+  REPLENISH
+  LOAD
+}
+
+enum RfStepStatus {
+  OPEN
+  COMPLETED
+  FAILED
+  SKIPPED
+}
+
+enum StockFreezeStatus {
+  ACTIVE
+  RELEASED
+}
+
+enum CycleCountPlanStatus {
+  DRAFT
+  RELEASED
+  COUNTING
+  RECONCILING
+  APPROVED
+  CANCELLED
+}
+
+enum CycleCountTaskStatus {
+  OPEN
+  IN_PROGRESS
+  SUBMITTED
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+enum ReplenishmentRuleStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum ReplenishmentStrategy {
+  MIN_MAX
+  DEMAND_BASED
+  EMERGENCY
+  PICK_FACE_TOPUP
+}
+
+enum ReplenishmentDemandStatus {
+  OPEN
+  TASK_CREATED
+  COMPLETED
+  CANCELLED
+}
+
+enum PackingStationStatus {
+  ACTIVE
+  INACTIVE
+  MAINTENANCE
+}
+
+enum ShipmentStatus {
+  DRAFT
+  PACKING
+  STAGED
+  LOADING
+  SHIPPED
+  CANCELLED
+  EXCEPTION
+}
+
+enum ShipmentPackageStatus {
+  OPEN
+  PACKED
+  STAGED
+  LOADED
+  SHIPPED
+  CANCELLED
+}
+
+enum CarrierLabelStatus {
+  QUEUED
+  GENERATED
+  PRINTED
+  FAILED
+  CANCELLED
+}
+
+enum CarrierCredentialStatus {
+  ACTIVE
+  INACTIVE
+  ROTATED
+  REVOKED
+}
+
+enum CarrierTrackingStatus {
+  ACCEPTED
+  IN_TRANSIT
+  OUT_FOR_DELIVERY
+  DELIVERED
+  EXCEPTION
+  CANCELLED
+  UNKNOWN
+}
+
+enum PickWaveStatus {
+  DRAFT
+  PLANNED
+  RELEASED
+  PICKING
+  COMPLETED
+  CANCELLED
+  EXCEPTION
+}
+
+enum PickWaveOrderStatus {
+  PLANNED
+  RELEASED
+  PICKING
+  PICKED
+  CANCELLED
+  EXCEPTION
+}
+
+enum PickCartStatus {
+  AVAILABLE
+  ASSIGNED
+  MAINTENANCE
+  RETIRED
+}
+
+enum PickToteStatus {
+  EMPTY
+  ASSIGNED
+  FULL
+  CLOSED
+  CANCELLED
+}
+
+model User {
+  id                   String                @id @default(uuid()) @db.Uuid
+  email                String                @unique
+  displayName          String                @map("display_name")
+  passwordHash         String                @map("password_hash")
+  status               UserStatus            @default(ACTIVE)
+  sessionVersion       Int                   @default(0) @map("session_version")
+  roles                UserRole[]
+  auditLogs            AuditLog[]            @relation("ActorAuditLogs")
+  trackingEvents       TrackingEvent[]       @relation("ActorTrackingEvents")
+  createdExceptions    WmsException[]        @relation("CreatedExceptions")
+  stockMovements       StockMovement[]       @relation("ActorStockMovements")
+  serialNumberEvents   SerialNumberEvent[]   @relation("ActorSerialNumberEvents")
+  assignedTasks        WarehouseTask[]       @relation("AssignedWarehouseTasks")
+  labelPrintJobs       LabelPrintJob[]       @relation("RequestedLabelPrintJobs")
+  notifications        Notification[]
+  clientAccess         UserClientAccess[]
+  refreshTokenSessions RefreshTokenSession[]
+  mfaTotpSecrets       MfaTotpSecret[]
+  authLoginAttempts    AuthLoginAttempt[]
+  workContext          UserWorkContext?
+  lastLoginAt          DateTime?             @map("last_login_at")
+  createdAt            DateTime              @default(now()) @map("created_at")
+  updatedAt            DateTime              @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+model Role {
+  id          String           @id @default(uuid()) @db.Uuid
+  code        String           @unique
+  name        String
+  description String?
+  users       UserRole[]
+  permissions RolePermission[]
+  createdAt   DateTime         @default(now()) @map("created_at")
+  updatedAt   DateTime         @updatedAt @map("updated_at")
+
+  @@map("roles")
+}
+
+model Permission {
+  id          String           @id @default(uuid()) @db.Uuid
+  code        String           @unique
+  description String?
+  roles       RolePermission[]
+  createdAt   DateTime         @default(now()) @map("created_at")
+  updatedAt   DateTime         @updatedAt @map("updated_at")
+
+  @@map("permissions")
+}
+
+model RolePermission {
+  roleId       String     @map("role_id") @db.Uuid
+  permissionId String     @map("permission_id") @db.Uuid
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  createdAt    DateTime   @default(now()) @map("created_at")
+
+  @@id([roleId, permissionId])
+  @@map("role_permissions")
+}
+
+model UserRole {
+  userId      String    @map("user_id") @db.Uuid
+  roleId      String    @map("role_id") @db.Uuid
+  warehouseId String    @map("warehouse_id") @db.Uuid
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role        Role      @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  warehouse   Warehouse @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  @@id([userId, roleId, warehouseId])
+  @@index([warehouseId])
+  @@map("user_roles")
+}
+
+model UserWorkContext {
+  id                     String    @id @default(uuid()) @db.Uuid
+  userId                 String    @unique @map("user_id") @db.Uuid
+  warehouseId            String    @map("warehouse_id") @db.Uuid
+  zone                   String?
+  shiftCode              String?   @map("shift_code")
+  rfMode                 String    @default("DESKTOP") @map("rf_mode")
+  scannerDeviceReference String?   @map("scanner_device_reference")
+  metadata               Json?
+  user                   User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  warehouse              Warehouse @relation(fields: [warehouseId], references: [id], onDelete: Restrict)
+  createdAt              DateTime  @default(now()) @map("created_at")
+  updatedAt              DateTime  @updatedAt @map("updated_at")
+
+  @@index([warehouseId])
+  @@map("user_work_contexts")
+}
+
+model WmsClient {
+  id                       String                     @id @default(uuid()) @db.Uuid
+  code                     String                     @unique
+  name                     String
+  status                   WmsClientStatus            @default(ACTIVE)
+  billingCurrency          String                     @default("EUR") @map("billing_currency")
+  externalReference        String?                    @map("external_reference")
+  metadata                 Json?
+  warehouses               ClientWarehouse[]
+  skuAliases               ClientSkuAlias[]
+  resourceLinks            ClientResourceLink[]
+  billingEvents            BillingEvent[]
+  billingInvoices          BillingInvoice[]
+  billingCreditNotes       BillingCreditNote[]
+  ownedInboundShipments    InboundShipment[]          @relation("InboundShipmentOwnerClient")
+  ownedOutboundOrders      OutboundOrder[]            @relation("OutboundOrderOwnerClient")
+  ownedHandlingUnits       HandlingUnit[]             @relation("HandlingUnitOwnerClient")
+  ownedStockQuants         StockQuant[]               @relation("StockQuantOwnerClient")
+  ownedReservations        Reservation[]              @relation("ReservationOwnerClient")
+  ownedWarehouseTasks      WarehouseTask[]            @relation("WarehouseTaskOwnerClient")
+  ownedStockMovements      StockMovement[]            @relation("StockMovementOwnerClient")
+  ownedShipments           Shipment[]                 @relation("ShipmentOwnerClient")
+  ownedShipmentPackages    ShipmentPackage[]          @relation("ShipmentPackageOwnerClient")
+  ownedCarrierLabels       CarrierLabel[]             @relation("CarrierLabelOwnerClient")
+  ownedPickWaves           PickWave[]                 @relation("PickWaveOwnerClient")
+  ownedSkuLots             SkuLot[]                   @relation("SkuLotOwnerClient")
+  ownedSerialNumbers       SerialNumber[]             @relation("SerialNumberOwnerClient")
+  ownedSerialNumberEvents  SerialNumberEvent[]        @relation("SerialNumberEventOwnerClient")
+  ownedWarehouseOrders     WarehouseOrder[]           @relation("WarehouseOrderOwnerClient")
+  ownedWarehouseOrderLines WarehouseOrderLine[]       @relation("WarehouseOrderLineOwnerClient")
+  ownedWarehouseOrderTasks WarehouseOrderTask[]       @relation("WarehouseOrderTaskOwnerClient")
+  periodCloses             BillingPeriodClose[]
+  storageSnapshots         StorageOccupancySnapshot[]
+  invoiceSequences         InvoiceNumberSequence[]
+  rateCards                ClientRateCard[]
+  userAccess               UserClientAccess[]
+  createdAt                DateTime                   @default(now()) @map("created_at")
+  updatedAt                DateTime                   @updatedAt @map("updated_at")
+
+  @@index([status])
+  @@map("wms_clients")
+}
+
+model ClientWarehouse {
+  id                    String    @id @default(uuid()) @db.Uuid
+  clientId              String    @map("client_id") @db.Uuid
+  warehouseId           String    @map("warehouse_id") @db.Uuid
+  isActive              Boolean   @default(true) @map("is_active")
+  defaultBillingProfile String?   @map("default_billing_profile")
+  externalReference     String?   @map("external_reference")
+  metadata              Json?
+  client                WmsClient @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+
+  @@unique([clientId, warehouseId])
+  @@index([warehouseId, isActive])
+  @@map("client_warehouses")
+}
+
+model ClientSkuAlias {
+  id            String    @id @default(uuid()) @db.Uuid
+  clientId      String    @map("client_id") @db.Uuid
+  warehouseId   String?   @map("warehouse_id") @db.Uuid
+  skuId         String?   @map("sku_id") @db.Uuid
+  clientSku     String    @map("client_sku")
+  clientBarcode String?   @map("client_barcode")
+  description   String?
+  metadata      Json?
+  client        WmsClient @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  @@unique([clientId, clientSku])
+  @@index([warehouseId, skuId])
+  @@index([clientBarcode])
+  @@map("client_sku_aliases")
+}
+
+model ClientResourceLink {
+  id                String    @id @default(uuid()) @db.Uuid
+  clientId          String    @map("client_id") @db.Uuid
+  warehouseId       String    @map("warehouse_id") @db.Uuid
+  resourceType      String    @map("resource_type")
+  resourceId        String    @map("resource_id")
+  externalReference String?   @map("external_reference")
+  metadata          Json?
+  client            WmsClient @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  @@unique([warehouseId, resourceType, resourceId])
+  @@index([clientId, resourceType])
+  @@index([warehouseId, clientId])
+  @@map("client_resource_links")
+}
+
+model UserClientAccess {
+  id          String     @id @default(uuid()) @db.Uuid
+  userId      String     @map("user_id") @db.Uuid
+  clientId    String     @map("client_id") @db.Uuid
+  warehouseId String?    @map("warehouse_id") @db.Uuid
+  isActive    Boolean    @default(true) @map("is_active")
+  metadata    Json?
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  client      WmsClient  @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  warehouse   Warehouse? @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+
+  @@unique([userId, clientId, warehouseId])
+  @@index([clientId, warehouseId, isActive])
+  @@map("user_client_access")
+}
+
+model ClientRateCard {
+  id          String       @id @default(uuid()) @db.Uuid
+  clientId    String       @map("client_id") @db.Uuid
+  warehouseId String       @map("warehouse_id") @db.Uuid
+  name        String
+  currency    String       @default("EUR")
+  validFrom   DateTime     @map("valid_from")
+  validTo     DateTime?    @map("valid_to")
+  isActive    Boolean      @default(true) @map("is_active")
+  metadata    Json?
+  client      WmsClient    @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  warehouse   Warehouse    @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  rates       ClientRate[]
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+
+  @@index([warehouseId, clientId, isActive, validFrom])
+  @@map("client_rate_cards")
+}
+
+model ClientRate {
+  id             String           @id @default(uuid()) @db.Uuid
+  rateCardId     String           @map("rate_card_id") @db.Uuid
+  eventType      BillingEventType @map("event_type")
+  unit           String           @default("EA")
+  unitPriceMinor Int              @map("unit_price_minor")
+  minChargeMinor Int?             @map("min_charge_minor")
+  vatRateBps     Int?             @map("vat_rate_bps")
+  metadata       Json?
+  rateCard       ClientRateCard   @relation(fields: [rateCardId], references: [id], onDelete: Cascade)
+  createdAt      DateTime         @default(now()) @map("created_at")
+  updatedAt      DateTime         @updatedAt @map("updated_at")
+
+  @@unique([rateCardId, eventType, unit])
+  @@index([eventType])
+  @@map("client_rates")
+}
+
+model InvoiceNumberSequence {
+  id          String     @id @default(uuid()) @db.Uuid
+  warehouseId String     @map("warehouse_id") @db.Uuid
+  clientId    String?    @map("client_id") @db.Uuid
+  prefix      String
+  year        Int
+  nextNumber  Int        @default(1) @map("next_number")
+  warehouse   Warehouse  @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  client      WmsClient? @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+
+  @@unique([warehouseId, clientId, year, prefix])
+  @@map("invoice_number_sequences")
+}
+
+model StorageOccupancySnapshot {
+  id                String    @id @default(uuid()) @db.Uuid
+  warehouseId       String    @map("warehouse_id") @db.Uuid
+  clientId          String    @map("client_id") @db.Uuid
+  skuId             String?   @map("sku_id") @db.Uuid
+  locationId        String?   @map("location_id") @db.Uuid
+  stockQuantId      String?   @map("stock_quant_id") @db.Uuid
+  quantity          Int       @default(0)
+  handlingUnitCount Int?      @map("handling_unit_count")
+  palletCount       Int?      @map("pallet_count")
+  snapshotDate      DateTime  @map("snapshot_date") @db.Date
+  metadata          Json?
+  warehouse         Warehouse @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  client            WmsClient @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  createdAt         DateTime  @default(now()) @map("created_at")
+
+  @@unique([warehouseId, clientId, skuId, locationId, stockQuantId, snapshotDate])
+  @@index([warehouseId, clientId, snapshotDate])
+  @@map("storage_occupancy_snapshots")
+}
+
+model BillingPeriodClose {
+  id          String              @id @default(uuid()) @db.Uuid
+  warehouseId String              @map("warehouse_id") @db.Uuid
+  clientId    String              @map("client_id") @db.Uuid
+  periodStart DateTime            @map("period_start")
+  periodEnd   DateTime            @map("period_end")
+  status      BillingPeriodStatus @default(OPEN)
+  closedAt    DateTime?           @map("closed_at")
+  closedBy    String?             @map("closed_by") @db.Uuid
+  metadata    Json?
+  warehouse   Warehouse           @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  client      WmsClient           @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  createdAt   DateTime            @default(now()) @map("created_at")
+  updatedAt   DateTime            @updatedAt @map("updated_at")
+
+  @@unique([warehouseId, clientId, periodStart, periodEnd])
+  @@index([warehouseId, clientId, status])
+  @@map("billing_period_closes")
+}
+
+model BillingEvent {
+  id             String              @id @default(uuid()) @db.Uuid
+  clientId       String              @map("client_id") @db.Uuid
+  warehouseId    String              @map("warehouse_id") @db.Uuid
+  eventType      BillingEventType    @map("event_type")
+  status         BillingEventStatus  @default(PENDING)
+  reference      String              @default(uuid())
+  resourceType   String?             @map("resource_type")
+  resourceId     String?             @map("resource_id")
+  description    String?
+  quantity       Int                 @default(1)
+  unitPriceMinor Int                 @default(0) @map("unit_price_minor")
+  amountMinor    Int                 @default(0) @map("amount_minor")
+  currency       String              @default("EUR")
+  occurredAt     DateTime            @default(now()) @map("occurred_at")
+  invoicedAt     DateTime?           @map("invoiced_at")
+  voidedAt       DateTime?           @map("voided_at")
+  metadata       Json?
+  client         WmsClient           @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  invoiceLine    BillingInvoiceLine?
+  createdAt      DateTime            @default(now()) @map("created_at")
+  updatedAt      DateTime            @updatedAt @map("updated_at")
+
+  @@unique([clientId, reference])
+  @@index([warehouseId, status, occurredAt])
+  @@index([clientId, status, occurredAt])
+  @@index([resourceType, resourceId])
+  @@map("billing_events")
+}
+
+model BillingInvoice {
+  id               String               @id @default(uuid()) @db.Uuid
+  clientId         String               @map("client_id") @db.Uuid
+  warehouseId      String               @map("warehouse_id") @db.Uuid
+  invoiceNumber    String               @map("invoice_number")
+  status           BillingInvoiceStatus @default(DRAFT)
+  periodStart      DateTime             @map("period_start")
+  periodEnd        DateTime             @map("period_end")
+  currency         String               @default("EUR")
+  subtotalMinor    Int                  @default(0) @map("subtotal_minor")
+  taxTotalMinor    Int                  @default(0) @map("tax_total_minor")
+  totalAmountMinor Int                  @default(0) @map("total_amount_minor")
+  finalizedAt      DateTime?            @map("finalized_at")
+  voidedAt         DateTime?            @map("voided_at")
+  metadata         Json?
+  client           WmsClient            @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  warehouse        Warehouse            @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  lines            BillingInvoiceLine[]
+  creditNotes      BillingCreditNote[]
+  createdAt        DateTime             @default(now()) @map("created_at")
+  updatedAt        DateTime             @updatedAt @map("updated_at")
+
+  @@unique([clientId, invoiceNumber])
+  @@index([warehouseId, clientId, status, periodStart])
+  @@map("billing_invoices")
+}
+
+model BillingInvoiceLine {
+  id               String                  @id @default(uuid()) @db.Uuid
+  invoiceId        String                  @map("invoice_id") @db.Uuid
+  billingEventId   String?                 @unique @map("billing_event_id") @db.Uuid
+  lineNumber       Int                     @map("line_number")
+  eventType        String                  @map("event_type")
+  description      String
+  quantity         Int                     @default(1)
+  amountMinor      Int                     @default(0) @map("amount_minor")
+  vatRateBps       Int?                    @map("vat_rate_bps")
+  netAmountMinor   Int                     @default(0) @map("net_amount_minor")
+  taxAmountMinor   Int                     @default(0) @map("tax_amount_minor")
+  grossAmountMinor Int                     @default(0) @map("gross_amount_minor")
+  currency         String                  @default("EUR")
+  metadata         Json?
+  invoice          BillingInvoice          @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  billingEvent     BillingEvent?           @relation(fields: [billingEventId], references: [id], onDelete: SetNull)
+  creditNoteLines  BillingCreditNoteLine[]
+  createdAt        DateTime                @default(now()) @map("created_at")
+  updatedAt        DateTime                @updatedAt @map("updated_at")
+
+  @@unique([invoiceId, lineNumber])
+  @@index([invoiceId])
+  @@index([eventType])
+  @@map("billing_invoice_lines")
+}
+
+model BillingCreditNote {
+  id               String                  @id @default(uuid()) @db.Uuid
+  clientId         String                  @map("client_id") @db.Uuid
+  warehouseId      String                  @map("warehouse_id") @db.Uuid
+  invoiceId        String                  @map("invoice_id") @db.Uuid
+  creditNoteNumber String                  @map("credit_note_number")
+  status           BillingCreditNoteStatus @default(DRAFT)
+  reasonCode       String?                 @map("reason_code")
+  reason           String?
+  currency         String                  @default("EUR")
+  subtotalMinor    Int                     @default(0) @map("subtotal_minor")
+  taxTotalMinor    Int                     @default(0) @map("tax_total_minor")
+  totalAmountMinor Int                     @default(0) @map("total_amount_minor")
+  finalizedAt      DateTime?               @map("finalized_at")
+  voidedAt         DateTime?               @map("voided_at")
+  metadata         Json?
+  client           WmsClient               @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  warehouse        Warehouse               @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  invoice          BillingInvoice          @relation(fields: [invoiceId], references: [id], onDelete: Restrict)
+  lines            BillingCreditNoteLine[]
+  createdAt        DateTime                @default(now()) @map("created_at")
+  updatedAt        DateTime                @updatedAt @map("updated_at")
+
+  @@unique([clientId, creditNoteNumber])
+  @@index([warehouseId, clientId, status, createdAt])
+  @@index([invoiceId])
+  @@map("billing_credit_notes")
+}
+
+model BillingCreditNoteLine {
+  id               String              @id @default(uuid()) @db.Uuid
+  creditNoteId     String              @map("credit_note_id") @db.Uuid
+  invoiceLineId    String?             @map("invoice_line_id") @db.Uuid
+  lineNumber       Int                 @map("line_number")
+  eventType        String              @map("event_type")
+  description      String
+  quantity         Int                 @default(1)
+  amountMinor      Int                 @default(0) @map("amount_minor")
+  vatRateBps       Int?                @map("vat_rate_bps")
+  netAmountMinor   Int                 @default(0) @map("net_amount_minor")
+  taxAmountMinor   Int                 @default(0) @map("tax_amount_minor")
+  grossAmountMinor Int                 @default(0) @map("gross_amount_minor")
+  currency         String              @default("EUR")
+  metadata         Json?
+  creditNote       BillingCreditNote   @relation(fields: [creditNoteId], references: [id], onDelete: Cascade)
+  invoiceLine      BillingInvoiceLine? @relation(fields: [invoiceLineId], references: [id], onDelete: SetNull)
+  createdAt        DateTime            @default(now()) @map("created_at")
+  updatedAt        DateTime            @updatedAt @map("updated_at")
+
+  @@unique([creditNoteId, lineNumber])
+  @@index([invoiceLineId])
+  @@index([eventType])
+  @@map("billing_credit_note_lines")
+}
+
+model Warehouse {
+  id                      String                     @id @default(uuid()) @db.Uuid
+  code                    String                     @unique
+  name                    String
+  timezone                String                     @default("Europe/Prague")
+  status                  WarehouseStatus            @default(ACTIVE)
+  locations               WarehouseLocation[]
+  parcels                 Parcel[]
+  trackingEvents          TrackingEvent[]
+  exceptions              WmsException[]
+  inboundShipments        InboundShipment[]
+  outboundOrders          OutboundOrder[]
+  scanners                ScannerDevice[]
+  labelTemplates          LabelTemplate[]
+  labelPrintJobs          LabelPrintJob[]
+  notifications           Notification[]
+  stockQuants             StockQuant[]
+  skuLots                 SkuLot[]
+  serialNumbers           SerialNumber[]
+  serialNumberEvents      SerialNumberEvent[]
+  warehouseOrders         WarehouseOrder[]
+  warehouseOrderLines     WarehouseOrderLine[]
+  warehouseOrderTasks     WarehouseOrderTask[]
+  stockMovements          StockMovement[]
+  reservations            Reservation[]
+  handlingUnits           HandlingUnit[]
+  warehouseTasks          WarehouseTask[]
+  pickWaves               PickWave[]
+  pickCarts               PickCart[]
+  pickTotes               PickTote[]
+  slottingRules           SlottingRule[]
+  skuVelocities           SkuVelocity[]
+  slottingRecommendations SlottingRecommendation[]
+  userRoles               UserRole[]
+  userWorkContexts        UserWorkContext[]
+  billingInvoices         BillingInvoice[]
+  billingCreditNotes      BillingCreditNote[]
+  carrierCredentials      CarrierCredential[]
+  userClientAccess        UserClientAccess[]
+  rateCards               ClientRateCard[]
+  invoiceSequences        InvoiceNumberSequence[]
+  storageSnapshots        StorageOccupancySnapshot[]
+  periodCloses            BillingPeriodClose[]
+  auditLogs               AuditLog[]
+  createdAt               DateTime                   @default(now()) @map("created_at")
+  updatedAt               DateTime                   @updatedAt @map("updated_at")
+
+  @@map("warehouses")
+}
+
+model WarehouseLocation {
+  id                          String                   @id @default(uuid()) @db.Uuid
+  warehouseId                 String                   @map("warehouse_id") @db.Uuid
+  parentId                    String?                  @map("parent_id") @db.Uuid
+  code                        String
+  name                        String
+  type                        WarehouseLocationType
+  barcode                     String?
+  zone                        String?
+  aisle                       String?
+  bay                         String?
+  level                       String?
+  bin                         String?
+  pickSequence                Int                      @default(0) @map("pick_sequence")
+  capacityWeightGrams         Int?                     @map("capacity_weight_grams")
+  capacityVolumeCm3           Int?                     @map("capacity_volume_cm3")
+  binStatus                   String                   @default("AVAILABLE") @map("bin_status")
+  binType                     String?                  @map("bin_type")
+  capacityUnits               Int?                     @map("capacity_units")
+  capacityHandlingUnits       Int?                     @map("capacity_handling_units")
+  capacityPallets             Int?                     @map("capacity_pallets")
+  capacityReservedUnits       Int                      @default(0) @map("capacity_reserved_units")
+  capacityReservedVolumeCm3   Int                      @default(0) @map("capacity_reserved_volume_cm3")
+  capacityReservedWeightGrams Int                      @default(0) @map("capacity_reserved_weight_grams")
+  isActive                    Boolean                  @default(true) @map("is_active")
+  warehouse                   Warehouse                @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  parent                      WarehouseLocation?       @relation("LocationHierarchy", fields: [parentId], references: [id])
+  children                    WarehouseLocation[]      @relation("LocationHierarchy")
+  parcels                     Parcel[]
+  trackingEvents              TrackingEvent[]
+  exceptions                  WmsException[]
+  stockQuants                 StockQuant[]
+  serialNumbersLastSeen       SerialNumber[]           @relation("SerialNumberLastSeenLocation")
+  fromSerialNumberEvents      SerialNumberEvent[]      @relation("FromLocationSerialNumberEvents")
+  toSerialNumberEvents        SerialNumberEvent[]      @relation("ToLocationSerialNumberEvents")
+  fromWarehouseOrders         WarehouseOrder[]         @relation("FromLocationWarehouseOrders")
+  toWarehouseOrders           WarehouseOrder[]         @relation("ToLocationWarehouseOrders")
+  fromMovements               StockMovement[]          @relation("FromLocationStockMovements")
+  toMovements                 StockMovement[]          @relation("ToLocationStockMovements")
+  fromTasks                   WarehouseTask[]          @relation("FromLocationWarehouseTasks")
+  toTasks                     WarehouseTask[]          @relation("ToLocationWarehouseTasks")
+  slottingFromRecommendations SlottingRecommendation[] @relation("SlottingRecommendationFromLocation")
+  slottingToRecommendations   SlottingRecommendation[] @relation("SlottingRecommendationToLocation")
+  handlingUnits               HandlingUnit[]
+  inboundDockShipments        InboundShipment[]        @relation("InboundShipmentDockLocation")
+  createdAt                   DateTime                 @default(now()) @map("created_at")
+  updatedAt                   DateTime                 @updatedAt @map("updated_at")
+
+  @@unique([warehouseId, code])
+  @@unique([warehouseId, barcode])
+  @@index([warehouseId, type])
+  @@index([warehouseId, zone, pickSequence])
+  @@index([parentId])
+  @@map("warehouse_locations")
+}
+
+model Parcel {
+  id                String                @id @default(uuid()) @db.Uuid
+  warehouseId       String                @map("warehouse_id") @db.Uuid
+  currentLocationId String?               @map("current_location_id") @db.Uuid
+  trackingNumber    String                @map("tracking_number")
+  status            ParcelStatus          @default(CREATED)
+  externalReference String?               @map("external_reference")
+  customerReference String?               @map("customer_reference")
+  recipientName     String?               @map("recipient_name")
+  carrier           String?
+  serviceLevel      String?               @map("service_level")
+  weightGrams       Int?                  @map("weight_grams")
+  metadata          Json?
+  warehouse         Warehouse             @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  currentLocation   WarehouseLocation?    @relation(fields: [currentLocationId], references: [id], onDelete: SetNull)
+  trackingEvents    TrackingEvent[]
+  exceptions        WmsException[]
+  inboundLines      InboundShipmentLine[]
+  outboundLines     OutboundOrderLine[]
+  labelPrintJobs    LabelPrintJob[]
+  createdAt         DateTime              @default(now()) @map("created_at")
+  updatedAt         DateTime              @updatedAt @map("updated_at")
+
+  @@unique([warehouseId, trackingNumber])
+  @@index([warehouseId, status])
+  @@index([currentLocationId])
+  @@map("parcels")
+}
+
+model TrackingEvent {
+  id          String             @id @default(uuid()) @db.Uuid
+  warehouseId String             @map("warehouse_id") @db.Uuid
+  parcelId    String?            @map("parcel_id") @db.Uuid
+  actorUserId String?            @map("actor_user_id") @db.Uuid
+  locationId  String?            @map("location_id") @db.Uuid
+  type        TrackingEventType
+  code        String?
+  message     String?
+  metadata    Json?
+  occurredAt  DateTime           @default(now()) @map("occurred_at")
+  createdAt   DateTime           @default(now()) @map("created_at")
+  warehouse   Warehouse          @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  parcel      Parcel?            @relation(fields: [parcelId], references: [id], onDelete: Cascade)
+  actor       User?              @relation("ActorTrackingEvents", fields: [actorUserId], references: [id], onDelete: SetNull)
+  location    WarehouseLocation? @relation(fields: [locationId], references: [id], onDelete: SetNull)
+
+  @@index([warehouseId, occurredAt])
+  @@index([parcelId, occurredAt])
+  @@index([type, occurredAt])
+  @@map("tracking_events")
+}
+
+model WmsException {
+  id              String             @id @default(uuid()) @db.Uuid
+  warehouseId     String             @map("warehouse_id") @db.Uuid
+  parcelId        String?            @map("parcel_id") @db.Uuid
+  locationId      String?            @map("location_id") @db.Uuid
+  createdByUserId String             @map("created_by_user_id") @db.Uuid
+  severity        ExceptionSeverity  @default(MEDIUM)
+  status          ExceptionStatus    @default(OPEN)
+  code            String
+  title           String
+  description     String?
+  metadata        Json?
+  resolvedAt      DateTime?          @map("resolved_at")
+  createdAt       DateTime           @default(now()) @map("created_at")
+  updatedAt       DateTime           @updatedAt @map("updated_at")
+  warehouse       Warehouse          @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  parcel          Parcel?            @relation(fields: [parcelId], references: [id], onDelete: Cascade)
+  location        WarehouseLocation? @relation(fields: [locationId], references: [id], onDelete: SetNull)
+  createdBy       User               @relation("CreatedExceptions", fields: [createdByUserId], references: [id], onDelete: Restrict)
+
+  @@index([warehouseId, status])
+  @@index([parcelId])
+  @@index([locationId])
+  @@index([createdByUserId])
+  @@index([severity, status])
+  @@map("wms_exceptions")
+}
+
+model InboundShipment {
+  id                     String                @id @default(uuid()) @db.Uuid
+  warehouseId            String                @map("warehouse_id") @db.Uuid
+  ownerClientId          String?               @map("owner_client_id") @db.Uuid
+  dockLocationId         String?               @map("dock_location_id") @db.Uuid
+  shipmentNumber         String                @map("shipment_number")
+  status                 InboundStatus         @default(CREATED)
+  supplierName           String?               @map("supplier_name")
+  supplierReference      String?               @map("supplier_reference")
+  purchaseOrderReference String?               @map("purchase_order_reference")
+  externalReference      String?               @map("external_reference")
+  expectedAt             DateTime?             @map("expected_at")
+  appointmentStartAt     DateTime?             @map("appointment_start_at")
+  appointmentEndAt       DateTime?             @map("appointment_end_at")
+  receivedAt             DateTime?             @map("received_at")
+  metadata               Json?
+  warehouse              Warehouse             @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  ownerClient            WmsClient?            @relation("InboundShipmentOwnerClient", fields: [ownerClientId], references: [id], onDelete: SetNull)
+  dockLocation           WarehouseLocation?    @relation("InboundShipmentDockLocation", fields: [dockLocationId], references: [id], onDelete: SetNull)
+  lines                  InboundShipmentLine[]
+  warehouseTasks         WarehouseTask[]
+  createdAt              DateTime              @default(now()) @map("created_at")
+  updatedAt              DateTime              @updatedAt @map("updated_at")
+
+  @@unique([warehouseId, shipmentNumber])
+  @@index([warehouseId, status])
+  @@index([warehouseId, ownerClientId])
+  @@index([dockLocationId])
+  @@index([warehouseId, appointmentStartAt])
+  @@index([warehouseId, supplierReference])
+  @@index([warehouseId, purchaseOrderReference])
+  @@map("inbound_shipments")
+}
+
+model InboundShipmentLine {
+  id               String          @id @default(uuid()) @db.Uuid
+  shipmentId       String          @map("shipment_id") @db.Uuid
+  parcelId         String?         @map("parcel_id") @db.Uuid
+  lineNumber       String          @map("line_number")
+  sku              String
+  description      String?
+  expectedQuantity Int             @default(1) @map("expected_quantity")
+  receivedQuantity Int             @default(0) @map("received_quantity")
+  metadata         Json?
+  shipment         InboundShipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+  parcel           Parcel?         @relation(fields: [parcelId], references: [id], onDelete: SetNull)
+  warehouseTasks   WarehouseTask[]
+  serialNumbers    SerialNumber[]
+  createdAt        DateTime        @default(now()) @map("created_at")
+  updatedAt        DateTime        @updatedAt @map("updated_at")
+
+  @@unique([shipmentId, lineNumber])
+  @@index([parcelId])
+  @@map("inbound_shipment_lines")
+}
+
+model OutboundOrder {
+  id                String              @id @default(uuid()) @db.Uuid
+  warehouseId       String              @map("warehouse_id") @db.Uuid
+  ownerClientId     String?             @map("owner_client_id") @db.Uuid
+  orderNumber       String              @map("order_number")
+  status            OutboundStatus      @default(CREATED)
+  customerReference String?             @map("customer_reference")
+  recipientName     String?             @map("recipient_name")
+  carrier           String?
+  serviceLevel      String?             @map("service_level")
+  shipBy            DateTime?           @map("ship_by")
+  shippedAt         DateTime?           @map("shipped_at")
+  metadata          Json?
+  warehouse         Warehouse           @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  ownerClient       WmsClient?          @relation("OutboundOrderOwnerClient", fields: [ownerClientId], references: [id], onDelete: SetNull)
+  lines             OutboundOrderLine[]
+  reservations      Reservation[]
+  warehouseTasks    WarehouseTask[]
+  pickWaveOrders    PickWaveOrder[]
+  pickTotes         PickTote[]
+  createdAt         DateTime            @default(now()) @map("created_at")
+  updatedAt         DateTime            @updatedAt @map("updated_at")
+
+  @@unique([warehouseId, orderNumber])
+  @@index([warehouseId, status])
+  @@index([warehouseId, ownerClientId])
+  @@map("outbound_orders")
+}
+
+model OutboundOrderLine {
+  id              String          @id @default(uuid()) @db.Uuid
+  orderId         String          @map("order_id") @db.Uuid
+  parcelId        String?         @map("parcel_id") @db.Uuid
+  lineNumber      String          @map("line_number")
+  sku             String
+  description     String?
+  orderedQuantity Int             @default(1) @map("ordered_quantity")
+  pickedQuantity  Int             @default(0) @map("picked_quantity")
+  metadata        Json?
+  order           OutboundOrder   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  parcel          Parcel?         @relation(fields: [parcelId], references: [id], onDelete: SetNull)
+  reservations    Reservation[]
+  warehouseTasks  WarehouseTask[]
+  serialNumbers   SerialNumber[]
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+
+  @@unique([orderId, lineNumber])
+  @@index([parcelId])
+  @@map("outbound_order_lines")
+}
+
+model ScannerDevice {
+  id           String        @id @default(uuid()) @db.Uuid
+  warehouseId  String        @map("warehouse_id") @db.Uuid
+  code         String
+  name         String
+  status       ScannerStatus @default(ACTIVE)
+  assignedZone String?       @map("assigned_zone")
+  lastSeenAt   DateTime?     @map("last_seen_at")
+  metadata     Json?
+  warehouse    Warehouse     @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+
+  @@unique([warehouseId, code])
+  @@index([warehouseId, status])
+  @@map("scanner_devices")
+}
+
+model LabelTemplate {
+  id          String            @id @default(uuid()) @db.Uuid
+  warehouseId String            @map("warehouse_id") @db.Uuid
+  code        String
+  name        String
+  type        LabelTemplateType @default(PARCEL)
+  content     String
+  isActive    Boolean           @default(true) @map("is_active")
+  metadata    Json?
+  warehouse   Warehouse         @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  printJobs   LabelPrintJob[]
+  createdAt   DateTime          @default(now()) @map("created_at")
+  updatedAt   DateTime          @updatedAt @map("updated_at")
+
+  @@unique([warehouseId, code])
+  @@index([warehouseId, type])
+  @@map("label_templates")
+}
+
+model LabelPrintJob {
+  id                String         @id @default(uuid()) @db.Uuid
+  warehouseId       String         @map("warehouse_id") @db.Uuid
+  parcelId          String         @map("parcel_id") @db.Uuid
+  templateId        String         @map("template_id") @db.Uuid
+  requestedByUserId String?        @map("requested_by_user_id") @db.Uuid
+  status            LabelJobStatus @default(QUEUED)
+  printerName       String?        @map("printer_name")
+  copies            Int            @default(1)
+  payload           Json?
+  idempotencyKey    String?        @map("idempotency_key")
+  requestHash       String?        @map("request_hash")
+  errorMessage      String?        @map("error_message")
+  printedAt         DateTime?      @map("printed_at")
+  warehouse         Warehouse      @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  parcel            Parcel         @relation(fields: [parcelId], references: [id], onDelete: Cascade)
+  template          LabelTemplate  @relation(fields: [templateId], references: [id], onDelete: Restrict)
+  requestedBy       User?          @relation("RequestedLabelPrintJobs", fields: [requestedByUserId], references: [id], onDelete: SetNull)
+  createdAt         DateTime       @default(now()) @map("created_at")
+  updatedAt         DateTime       @updatedAt @map("updated_at")
+
+  @@index([warehouseId, status])
+  @@index([parcelId])
+  @@unique([warehouseId, idempotencyKey])
+  @@map("label_print_jobs")
+}
+
+model Notification {
+  id          String             @id @default(uuid()) @db.Uuid
+  warehouseId String             @map("warehouse_id") @db.Uuid
+  userId      String?            @map("user_id") @db.Uuid
+  type        NotificationType   @default(INFO)
+  status      NotificationStatus @default(UNREAD)
+  title       String
+  message     String
+  metadata    Json?
+  readAt      DateTime?          @map("read_at")
+  createdAt   DateTime           @default(now()) @map("created_at")
+  updatedAt   DateTime           @updatedAt @map("updated_at")
+  warehouse   Warehouse          @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  user        User?              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([warehouseId, status])
+  @@index([userId, status])
+  @@map("notifications")
+}
+
+model Product {
+  id          String        @id @default(uuid()) @db.Uuid
+  code        String        @unique
+  name        String
+  description String?
+  status      ProductStatus @default(ACTIVE)
+  metadata    Json?
+  skus        Sku[]
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+
+  @@index([status])
+  @@map("products")
+}
+
+model Sku {
+  id                      String                   @id @default(uuid()) @db.Uuid
+  productId               String                   @map("product_id") @db.Uuid
+  code                    String                   @unique
+  name                    String
+  barcode                 String?                  @unique
+  uom                     String                   @default("EA")
+  weightGrams             Int?                     @map("weight_grams")
+  status                  SkuStatus                @default(ACTIVE)
+  metadata                Json?
+  product                 Product                  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  stockQuants             StockQuant[]
+  skuLots                 SkuLot[]
+  serialNumbers           SerialNumber[]
+  warehouseOrderLines     WarehouseOrderLine[]
+  stockMovements          StockMovement[]
+  reservations            Reservation[]
+  warehouseTasks          WarehouseTask[]
+  skuVelocities           SkuVelocity[]
+  slottingRecommendations SlottingRecommendation[]
+  createdAt               DateTime                 @default(now()) @map("created_at")
+  updatedAt               DateTime                 @updatedAt @map("updated_at")
+
+  @@index([productId])
+  @@index([status])
+  @@map("skus")
+}
+
+model HandlingUnit {
+  id                String             @id @default(uuid()) @db.Uuid
+  warehouseId       String             @map("warehouse_id") @db.Uuid
+  ownerClientId     String?            @map("owner_client_id") @db.Uuid
+  currentLocationId String?            @map("current_location_id") @db.Uuid
+  parentId          String?            @map("parent_id") @db.Uuid
+  code              String
+  type              String             @default("PALLET")
+  status            HandlingUnitStatus @default(OPEN)
+  metadata          Json?
+  warehouse         Warehouse          @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  ownerClient       WmsClient?         @relation("HandlingUnitOwnerClient", fields: [ownerClientId], references: [id], onDelete: SetNull)
+  currentLocation   WarehouseLocation? @relation(fields: [currentLocationId], references: [id], onDelete: SetNull)
+  parent            HandlingUnit?      @relation("HandlingUnitHierarchy", fields: [parentId], references: [id])
+  children          HandlingUnit[]     @relation("HandlingUnitHierarchy")
+  stockQuants       StockQuant[]
+  warehouseTasks    WarehouseTask[]
+  createdAt         DateTime           @default(now()) @map("created_at")
+  updatedAt         DateTime           @updatedAt @map("updated_at")
+
+  @@unique([warehouseId, code])
+  @@index([currentLocationId])
+  @@index([parentId])
+  @@index([warehouseId, status])
+  @@index([warehouseId, ownerClientId])
+  @@map("handling_units")
+}
+
+model StockQuant {
+  id                 String              @id @default(uuid()) @db.Uuid
+  warehouseId        String              @map("warehouse_id") @db.Uuid
+  ownerClientId      String?             @map("owner_client_id") @db.Uuid
+  locationId         String              @map("location_id") @db.Uuid
+  skuId              String              @map("sku_id") @db.Uuid
+  handlingUnitId     String?             @map("handling_unit_id") @db.Uuid
+  lotId              String?             @map("lot_id") @db.Uuid
+  quantity           Int
+  reservedQuantity   Int                 @default(0) @map("reserved_quantity")
+  status             StockQuantStatus    @default(AVAILABLE)
+  batch              String?
+  expiryDate         DateTime?           @map("expiry_date") @db.Date
+  externalReference  String?             @map("external_reference")
+  version            Int                 @default(0)
+  metadata           Json?
+  warehouse          Warehouse           @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  ownerClient        WmsClient?          @relation("StockQuantOwnerClient", fields: [ownerClientId], references: [id], onDelete: SetNull)
+  location           WarehouseLocation   @relation(fields: [locationId], references: [id], onDelete: Restrict)
+  sku                Sku                 @relation(fields: [skuId], references: [id], onDelete: Restrict)
+  lot                SkuLot?             @relation(fields: [lotId], references: [id], onDelete: SetNull)
+  handlingUnit       HandlingUnit?       @relation(fields: [handlingUnitId], references: [id], onDelete: SetNull)
+  serialNumbers      SerialNumber[]
+  serialNumberEvents SerialNumberEvent[]
+  reservations       Reservation[]
+  movements          StockMovement[]
+  createdAt          DateTime            @default(now()) @map("created_at")
+  updatedAt          DateTime            @updatedAt @map("updated_at")
+
+  @@index([warehouseId, status])
+  @@index([warehouseId, ownerClientId])
+  @@index([warehouseId, ownerClientId, status])
+  @@index([warehouseId, skuId, status])
+  @@index([locationId])
+  @@index([skuId, expiryDate])
+  @@index([lotId])
+  @@index([handlingUnitId])
+  @@map("stock_quants")
+}
+
+model Reservation {
+  id                  String             @id @default(uuid()) @db.Uuid
+  warehouseId         String             @map("warehouse_id") @db.Uuid
+  ownerClientId       String?            @map("owner_client_id") @db.Uuid
+  outboundOrderId     String?            @map("outbound_order_id") @db.Uuid
+  outboundOrderLineId String?            @map("outbound_order_line_id") @db.Uuid
+  stockQuantId        String             @map("stock_quant_id") @db.Uuid
+  skuId               String             @map("sku_id") @db.Uuid
+  quantity            Int
+  status              ReservationStatus  @default(ACTIVE)
+  allocationStrategy  String?            @map("allocation_strategy")
+  expiresAt           DateTime?          @map("expires_at")
+  metadata            Json?
+  warehouse           Warehouse          @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  ownerClient         WmsClient?         @relation("ReservationOwnerClient", fields: [ownerClientId], references: [id], onDelete: SetNull)
+  outboundOrder       OutboundOrder?     @relation(fields: [outboundOrderId], references: [id], onDelete: Cascade)
+  outboundOrderLine   OutboundOrderLine? @relation(fields: [outboundOrderLineId], references: [id], onDelete: Cascade)
+  stockQuant          StockQuant         @relation(fields: [stockQuantId], references: [id], onDelete: Restrict)
+  sku                 Sku                @relation(fields: [skuId], references: [id], onDelete: Restrict)
+  stockMovements      StockMovement[]
+  warehouseTasks      WarehouseTask[]
+  createdAt           DateTime           @default(now()) @map("created_at")
+  updatedAt           DateTime           @updatedAt @map("updated_at")
+
+  @@index([warehouseId, status])
+  @@index([warehouseId, ownerClientId, status])
+  @@index([outboundOrderId])
+  @@index([outboundOrderLineId])
+  @@index([stockQuantId])
+  @@index([skuId])
+  @@map("reservations")
+}
+
+model WarehouseTask {
+  id                    String               @id @default(uuid()) @db.Uuid
+  warehouseId           String               @map("warehouse_id") @db.Uuid
+  ownerClientId         String?              @map("owner_client_id") @db.Uuid
+  type                  WarehouseTaskType
+  status                WarehouseTaskStatus  @default(OPEN)
+  skuId                 String?              @map("sku_id") @db.Uuid
+  fromLocationId        String?              @map("from_location_id") @db.Uuid
+  toLocationId          String?              @map("to_location_id") @db.Uuid
+  assignedUserId        String?              @map("assigned_user_id") @db.Uuid
+  outboundOrderId       String?              @map("outbound_order_id") @db.Uuid
+  outboundOrderLineId   String?              @map("outbound_order_line_id") @db.Uuid
+  inboundShipmentId     String?              @map("inbound_shipment_id") @db.Uuid
+  inboundShipmentLineId String?              @map("inbound_shipment_line_id") @db.Uuid
+  reservationId         String?              @map("reservation_id") @db.Uuid
+  handlingUnitId        String?              @map("handling_unit_id") @db.Uuid
+  quantity              Int?
+  priority              Int                  @default(100)
+  externalReference     String?              @map("external_reference")
+  failureReason         String?              @map("failure_reason")
+  version               Int                  @default(0)
+  metadata              Json?
+  assignedAt            DateTime?            @map("assigned_at")
+  dueAt                 DateTime?            @map("due_at")
+  startedAt             DateTime?            @map("started_at")
+  completedAt           DateTime?            @map("completed_at")
+  warehouse             Warehouse            @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  ownerClient           WmsClient?           @relation("WarehouseTaskOwnerClient", fields: [ownerClientId], references: [id], onDelete: SetNull)
+  sku                   Sku?                 @relation(fields: [skuId], references: [id], onDelete: SetNull)
+  fromLocation          WarehouseLocation?   @relation("FromLocationWarehouseTasks", fields: [fromLocationId], references: [id], onDelete: SetNull)
+  toLocation            WarehouseLocation?   @relation("ToLocationWarehouseTasks", fields: [toLocationId], references: [id], onDelete: SetNull)
+  assignedUser          User?                @relation("AssignedWarehouseTasks", fields: [assignedUserId], references: [id], onDelete: SetNull)
+  outboundOrder         OutboundOrder?       @relation(fields: [outboundOrderId], references: [id], onDelete: SetNull)
+  outboundOrderLine     OutboundOrderLine?   @relation(fields: [outboundOrderLineId], references: [id], onDelete: SetNull)
+  inboundShipment       InboundShipment?     @relation(fields: [inboundShipmentId], references: [id], onDelete: SetNull)
+  inboundShipmentLine   InboundShipmentLine? @relation(fields: [inboundShipmentLineId], references: [id], onDelete: SetNull)
+  reservation           Reservation?         @relation(fields: [reservationId], references: [id], onDelete: SetNull)
+  handlingUnit          HandlingUnit?        @relation(fields: [handlingUnitId], references: [id], onDelete: SetNull)
+  stockMovements        StockMovement[]
+  pickWaveTasks         PickWaveTask[]
+  warehouseOrderLinks   WarehouseOrderTask[]
+  createdAt             DateTime             @default(now()) @map("created_at")
+  updatedAt             DateTime             @updatedAt @map("updated_at")
+
+  @@index([warehouseId, status])
+  @@index([warehouseId, ownerClientId, status])
+  @@index([warehouseId, type])
+  @@index([warehouseId, type, status, priority])
+  @@index([warehouseId, dueAt])
+  @@index([assignedUserId, status])
+  @@index([skuId])
+  @@index([fromLocationId])
+  @@index([toLocationId])
+  @@index([outboundOrderId])
+  @@index([reservationId])
+  @@map("warehouse_tasks")
+}
+
+model StockMovement {
+  id             String             @id @default(uuid()) @db.Uuid
+  warehouseId    String             @map("warehouse_id") @db.Uuid
+  ownerClientId  String?            @map("owner_client_id") @db.Uuid
+  skuId          String             @map("sku_id") @db.Uuid
+  stockQuantId   String?            @map("stock_quant_id") @db.Uuid
+  reservationId  String?            @map("reservation_id") @db.Uuid
+  taskId         String?            @map("task_id") @db.Uuid
+  actorUserId    String?            @map("actor_user_id") @db.Uuid
+  type           StockMovementType
+  quantity       Int
+  fromLocationId String?            @map("from_location_id") @db.Uuid
+  toLocationId   String?            @map("to_location_id") @db.Uuid
+  referenceType  String?            @map("reference_type")
+  referenceId    String?            @map("reference_id")
+  sourceSystem   String?            @map("source_system")
+  idempotencyKey String?            @map("idempotency_key")
+  metadata       Json?
+  occurredAt     DateTime           @default(now()) @map("occurred_at")
+  createdAt      DateTime           @default(now()) @map("created_at")
+  warehouse      Warehouse          @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  ownerClient    WmsClient?         @relation("StockMovementOwnerClient", fields: [ownerClientId], references: [id], onDelete: SetNull)
+  sku            Sku                @relation(fields: [skuId], references: [id], onDelete: Restrict)
+  stockQuant     StockQuant?        @relation(fields: [stockQuantId], references: [id], onDelete: SetNull)
+  reservation    Reservation?       @relation(fields: [reservationId], references: [id], onDelete: SetNull)
+  task           WarehouseTask?     @relation(fields: [taskId], references: [id], onDelete: SetNull)
+  actor          User?              @relation("ActorStockMovements", fields: [actorUserId], references: [id], onDelete: SetNull)
+  fromLocation   WarehouseLocation? @relation("FromLocationStockMovements", fields: [fromLocationId], references: [id], onDelete: SetNull)
+  toLocation     WarehouseLocation? @relation("ToLocationStockMovements", fields: [toLocationId], references: [id], onDelete: SetNull)
+
+  @@unique([sourceSystem, idempotencyKey])
+  @@index([warehouseId, occurredAt])
+  @@index([warehouseId, ownerClientId, occurredAt])
+  @@index([skuId, occurredAt])
+  @@index([stockQuantId])
+  @@index([reservationId])
+  @@index([taskId])
+  @@index([referenceType, referenceId])
+  @@map("stock_movements")
+}
+
+model IdempotencyRecord {
+  id             String            @id @default(uuid()) @db.Uuid
+  sourceSystem   String            @map("source_system")
+  externalId     String?           @map("external_id")
+  idempotencyKey String            @map("idempotency_key")
+  requestHash    String            @map("request_hash")
+  responseBody   Json?             @map("response_body")
+  resourceType   String?           @map("resource_type")
+  resourceId     String?           @map("resource_id")
+  status         IdempotencyStatus @default(IN_PROGRESS)
+  createdAt      DateTime          @default(now()) @map("created_at")
+  updatedAt      DateTime          @updatedAt @map("updated_at")
+
+  @@unique([sourceSystem, idempotencyKey])
+  @@index([sourceSystem, externalId])
+  @@index([status])
+  @@map("idempotency_records")
+}
+
+model OutboxEvent {
+  id            String            @id @default(uuid()) @db.Uuid
+  type          String
+  aggregateType String            @map("aggregate_type")
+  aggregateId   String            @map("aggregate_id")
+  payload       Json
+  status        OutboxEventStatus @default(PENDING)
+  attempts      Int               @default(0)
+  lastError     String?           @map("last_error")
+  availableAt   DateTime          @default(now()) @map("available_at")
+  sentAt        DateTime?         @map("sent_at")
+  createdAt     DateTime          @default(now()) @map("created_at")
+  updatedAt     DateTime          @updatedAt @map("updated_at")
+
+  @@index([status, availableAt])
+  @@index([aggregateType, aggregateId])
+  @@map("outbox_events")
+}
+
+model InboxEvent {
+  id              String           @id @default(uuid()) @db.Uuid
+  sourceSystem    String           @map("source_system")
+  externalEventId String           @map("external_event_id")
+  type            String
+  status          InboxEventStatus @default(RECEIVED)
+  payload         Json
+  headers         Json?
+  resourceType    String?          @map("resource_type")
+  resourceId      String?          @map("resource_id")
+  attempts        Int              @default(0)
+  lastError       String?          @map("last_error")
+  receivedAt      DateTime         @default(now()) @map("received_at")
+  processedAt     DateTime?        @map("processed_at")
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+
+  @@unique([sourceSystem, externalEventId])
+  @@index([status, receivedAt])
+  @@index([type, receivedAt])
+  @@map("inbox_events")
+}
+
+model ScannerSession {
+  id              String               @id @default(uuid()) @db.Uuid
+  warehouseId     String               @map("warehouse_id") @db.Uuid
+  scannerDeviceId String?              @map("scanner_device_id") @db.Uuid
+  userId          String               @map("user_id") @db.Uuid
+  taskId          String?              @map("task_id") @db.Uuid
+  workflow        RfWorkflowType
+  status          ScannerSessionStatus @default(ACTIVE)
+  currentStepKey  String?              @map("current_step_key")
+  metadata        Json?
+  startedAt       DateTime             @default(now()) @map("started_at")
+  heartbeatAt     DateTime             @default(now()) @map("heartbeat_at")
+  completedAt     DateTime?            @map("completed_at")
+  createdAt       DateTime             @default(now()) @map("created_at")
+  updatedAt       DateTime             @updatedAt @map("updated_at")
+
+  @@index([warehouseId, status])
+  @@index([scannerDeviceId, status])
+  @@index([userId, status])
+  @@index([taskId, status])
+  @@map("scanner_sessions")
+}
+
+model ScannerWorkflowStep {
+  id            String       @id @default(uuid()) @db.Uuid
+  sessionId     String       @map("session_id") @db.Uuid
+  warehouseId   String       @map("warehouse_id") @db.Uuid
+  taskId        String?      @map("task_id") @db.Uuid
+  stepKey       String       @map("step_key")
+  sequence      Int          @default(0)
+  status        RfStepStatus @default(OPEN)
+  instruction   String
+  expectedType  String?      @map("expected_type")
+  expectedValue String?      @map("expected_value")
+  scannedValue  String?      @map("scanned_value")
+  quantity      Int?
+  errorCode     String?      @map("error_code")
+  metadata      Json?
+  completedAt   DateTime?    @map("completed_at")
+  createdAt     DateTime     @default(now()) @map("created_at")
+  updatedAt     DateTime     @updatedAt @map("updated_at")
+
+  @@index([sessionId, status, sequence])
+  @@index([warehouseId, taskId])
+  @@map("scanner_workflow_steps")
+}
+
+model StockFreeze {
+  id              String            @id @default(uuid()) @db.Uuid
+  warehouseId     String            @map("warehouse_id") @db.Uuid
+  planId          String?           @map("plan_id") @db.Uuid
+  locationId      String?           @map("location_id") @db.Uuid
+  skuId           String?           @map("sku_id") @db.Uuid
+  stockQuantId    String?           @map("stock_quant_id") @db.Uuid
+  status          StockFreezeStatus @default(ACTIVE)
+  reason          String
+  createdByUserId String?           @map("created_by_user_id") @db.Uuid
+  releasedAt      DateTime?         @map("released_at")
+  createdAt       DateTime          @default(now()) @map("created_at")
+  updatedAt       DateTime          @updatedAt @map("updated_at")
+
+  @@index([warehouseId, status])
+  @@index([planId, status])
+  @@index([locationId, status])
+  @@index([stockQuantId, status])
+  @@map("stock_freezes")
+}
+
+model CycleCountPlan {
+  id               String               @id @default(uuid()) @db.Uuid
+  warehouseId      String               @map("warehouse_id") @db.Uuid
+  code             String
+  status           CycleCountPlanStatus @default(DRAFT)
+  scopeType        String               @default("LOCATION") @map("scope_type")
+  scopeReference   String?              @map("scope_reference")
+  createdByUserId  String?              @map("created_by_user_id") @db.Uuid
+  releasedByUserId String?              @map("released_by_user_id") @db.Uuid
+  approvedByUserId String?              @map("approved_by_user_id") @db.Uuid
+  metadata         Json?
+  releasedAt       DateTime?            @map("released_at")
+  approvedAt       DateTime?            @map("approved_at")
+  createdAt        DateTime             @default(now()) @map("created_at")
+  updatedAt        DateTime             @updatedAt @map("updated_at")
+
+  @@unique([warehouseId, code])
+  @@index([warehouseId, status])
+  @@map("cycle_count_plans")
+}
+
+model CycleCountTask {
+  id               String               @id @default(uuid()) @db.Uuid
+  warehouseId      String               @map("warehouse_id") @db.Uuid
+  planId           String               @map("plan_id") @db.Uuid
+  warehouseTaskId  String?              @map("warehouse_task_id") @db.Uuid
+  locationId       String               @map("location_id") @db.Uuid
+  skuId            String?              @map("sku_id") @db.Uuid
+  stockQuantId     String?              @map("stock_quant_id") @db.Uuid
+  expectedQuantity Int?                 @map("expected_quantity")
+  countedQuantity  Int?                 @map("counted_quantity")
+  varianceQuantity Int?                 @map("variance_quantity")
+  status           CycleCountTaskStatus @default(OPEN)
+  countedByUserId  String?              @map("counted_by_user_id") @db.Uuid
+  approvedByUserId String?              @map("approved_by_user_id") @db.Uuid
+  submittedAt      DateTime?            @map("submitted_at")
+  approvedAt       DateTime?            @map("approved_at")
+  metadata         Json?
+  createdAt        DateTime             @default(now()) @map("created_at")
+  updatedAt        DateTime             @updatedAt @map("updated_at")
+
+  @@index([warehouseId, status])
+  @@index([planId, status])
+  @@index([warehouseTaskId])
+  @@index([locationId, skuId])
+  @@index([stockQuantId])
+  @@map("cycle_count_tasks")
+}
+
+model ReplenishmentRule {
+  id             String                  @id @default(uuid()) @db.Uuid
+  warehouseId    String                  @map("warehouse_id") @db.Uuid
+  code           String
+  status         ReplenishmentRuleStatus @default(ACTIVE)
+  strategy       ReplenishmentStrategy   @default(MIN_MAX)
+  skuId          String                  @map("sku_id") @db.Uuid
+  pickLocationId String                  @map("pick_location_id") @db.Uuid
+  sourceZone     String?                 @map("source_zone")
+  minQuantity    Int                     @map("min_quantity")
+  maxQuantity    Int                     @map("max_quantity")
+  targetQuantity Int                     @map("target_quantity")
+  priority       Int                     @default(100)
+  metadata       Json?
+  createdAt      DateTime                @default(now()) @map("created_at")
+  updatedAt      DateTime                @updatedAt @map("updated_at")
+
+  @@unique([warehouseId, code])
+  @@index([warehouseId, status])
+  @@index([warehouseId, skuId])
+  @@index([pickLocationId])
+  @@map("replenishment_rules")
+}
+
+model ReplenishmentDemand {
+  id                    String                    @id @default(uuid()) @db.Uuid
+  warehouseId           String                    @map("warehouse_id") @db.Uuid
+  ruleId                String                    @map("rule_id") @db.Uuid
+  skuId                 String                    @map("sku_id") @db.Uuid
+  pickLocationId        String                    @map("pick_location_id") @db.Uuid
+  sourceLocationId      String?                   @map("source_location_id") @db.Uuid
+  stockQuantId          String?                   @map("stock_quant_id") @db.Uuid
+  warehouseTaskId       String?                   @map("warehouse_task_id") @db.Uuid
+  status                ReplenishmentDemandStatus @default(OPEN)
+  requiredQuantity      Int                       @map("required_quantity")
+  availablePickQuantity Int                       @default(0) @map("available_pick_quantity")
+  priority              Int                       @default(100)
+  metadata              Json?
+  createdAt             DateTime                  @default(now()) @map("created_at")
+  updatedAt             DateTime                  @updatedAt @map("updated_at")
+
+  @@index([warehouseId, status])
+  @@index([ruleId, status])
+  @@index([warehouseTaskId])
+  @@index([pickLocationId])
+  @@map("replenishment_demands")
+}
+
+model PackingStation {
+  id          String               @id @default(uuid()) @db.Uuid
+  warehouseId String               @map("warehouse_id") @db.Uuid
+  code        String
+  name        String
+  locationId  String?              @map("location_id") @db.Uuid
+  status      PackingStationStatus @default(ACTIVE)
+  metadata    Json?
+  createdAt   DateTime             @default(now()) @map("created_at")
+  updatedAt   DateTime             @updatedAt @map("updated_at")
+
+  @@unique([warehouseId, code])
+  @@index([warehouseId, status])
+  @@index([locationId])
+  @@map("packing_stations")
+}
+
+model Shipment {
+  id                String         @id @default(uuid()) @db.Uuid
+  warehouseId       String         @map("warehouse_id") @db.Uuid
+  ownerClientId     String?        @map("owner_client_id") @db.Uuid
+  shipmentNumber    String         @map("shipment_number")
+  outboundOrderId   String?        @map("outbound_order_id") @db.Uuid
+  packingStationId  String?        @map("packing_station_id") @db.Uuid
+  stagedLocationId  String?        @map("staged_location_id") @db.Uuid
+  status            ShipmentStatus @default(DRAFT)
+  carrier           String?
+  serviceLevel      String?        @map("service_level")
+  trackingReference String?        @map("tracking_reference")
+  metadata          Json?
+  stagedAt          DateTime?      @map("staged_at")
+  loadedAt          DateTime?      @map("loaded_at")
+  shippedAt         DateTime?      @map("shipped_at")
+  ownerClient       WmsClient?     @relation("ShipmentOwnerClient", fields: [ownerClientId], references: [id], onDelete: SetNull)
+  createdAt         DateTime       @default(now()) @map("created_at")
+  updatedAt         DateTime       @updatedAt @map("updated_at")
+
+  @@unique([warehouseId, shipmentNumber])
+  @@index([warehouseId, status])
+  @@index([warehouseId, ownerClientId, status])
+  @@index([outboundOrderId])
+  @@index([packingStationId])
+  @@map("shipments")
+}
+
+model ShipmentPackage {
+  id              String                @id @default(uuid()) @db.Uuid
+  warehouseId     String                @map("warehouse_id") @db.Uuid
+  ownerClientId   String?               @map("owner_client_id") @db.Uuid
+  shipmentId      String                @map("shipment_id") @db.Uuid
+  outboundOrderId String?               @map("outbound_order_id") @db.Uuid
+  packageCode     String                @map("package_code")
+  status          ShipmentPackageStatus @default(OPEN)
+  packageType     String                @default("CARTON") @map("package_type")
+  weightGrams     Int?                  @map("weight_grams")
+  lengthCm        Int?                  @map("length_cm")
+  widthCm         Int?                  @map("width_cm")
+  heightCm        Int?                  @map("height_cm")
+  trackingNumber  String?               @map("tracking_number")
+  metadata        Json?
+  packedAt        DateTime?             @map("packed_at")
+  ownerClient     WmsClient?            @relation("ShipmentPackageOwnerClient", fields: [ownerClientId], references: [id], onDelete: SetNull)
+  createdAt       DateTime              @default(now()) @map("created_at")
+  updatedAt       DateTime              @updatedAt @map("updated_at")
+
+  @@unique([warehouseId, packageCode])
+  @@index([shipmentId, status])
+  @@index([warehouseId, ownerClientId, status])
+  @@index([outboundOrderId])
+  @@map("shipment_packages")
+}
+
+model PackageContent {
+  id                  String   @id @default(uuid()) @db.Uuid
+  packageId           String   @map("package_id") @db.Uuid
+  outboundOrderLineId String?  @map("outbound_order_line_id") @db.Uuid
+  sku                 String
+  quantity            Int
+  metadata            Json?
+  createdAt           DateTime @default(now()) @map("created_at")
+
+  @@index([packageId])
+  @@index([outboundOrderLineId])
+  @@map("package_contents")
+}
+
+model CarrierLabel {
+  id             String             @id @default(uuid()) @db.Uuid
+  warehouseId    String             @map("warehouse_id") @db.Uuid
+  ownerClientId  String?            @map("owner_client_id") @db.Uuid
+  shipmentId     String?            @map("shipment_id") @db.Uuid
+  packageId      String?            @map("package_id") @db.Uuid
+  labelReference String             @map("label_reference")
+  status         CarrierLabelStatus @default(QUEUED)
+  carrier        String?
+  serviceLevel   String?            @map("service_level")
+  trackingNumber String?            @map("tracking_number")
+  labelFormat    String             @default("ZPL") @map("label_format")
+  payload        Json?
+  errorMessage   String?            @map("error_message")
+  printedAt      DateTime?          @map("printed_at")
+  ownerClient    WmsClient?         @relation("CarrierLabelOwnerClient", fields: [ownerClientId], references: [id], onDelete: SetNull)
+  createdAt      DateTime           @default(now()) @map("created_at")
+  updatedAt      DateTime           @updatedAt @map("updated_at")
+
+  @@unique([warehouseId, labelReference])
+  @@index([warehouseId, status])
+  @@index([warehouseId, ownerClientId, status])
+  @@index([shipmentId])
+  @@index([packageId])
+  @@map("carrier_labels")
+}
+
+model PickWave {
+  id            String          @id @default(uuid()) @db.Uuid
+  warehouseId   String          @map("warehouse_id") @db.Uuid
+  ownerClientId String?         @map("owner_client_id") @db.Uuid
+  waveNumber    String          @map("wave_number")
+  status        PickWaveStatus  @default(DRAFT)
+  priority      Int             @default(100)
+  strategy      String          @default("SINGLE_ORDER")
+  carrier       String?
+  serviceLevel  String?         @map("service_level")
+  zone          String?
+  cutoffAt      DateTime?       @map("cutoff_at")
+  metadata      Json?
+  releasedAt    DateTime?       @map("released_at")
+  completedAt   DateTime?       @map("completed_at")
+  createdAt     DateTime        @default(now()) @map("created_at")
+  updatedAt     DateTime        @updatedAt @map("updated_at")
+  warehouse     Warehouse       @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  ownerClient   WmsClient?      @relation("PickWaveOwnerClient", fields: [ownerClientId], references: [id], onDelete: SetNull)
+  orders        PickWaveOrder[]
+  tasks         PickWaveTask[]
+  carts         PickCart[]
+  totes         PickTote[]
+
+  @@unique([warehouseId, waveNumber])
+  @@index([warehouseId, status, priority])
+  @@index([warehouseId, ownerClientId, status])
+  @@index([warehouseId, cutoffAt])
+  @@index([warehouseId, carrier])
+  @@map("pick_waves")
+}
+
+model PickWaveOrder {
+  id              String              @id @default(uuid()) @db.Uuid
+  warehouseId     String              @map("warehouse_id") @db.Uuid
+  waveId          String              @map("wave_id") @db.Uuid
+  outboundOrderId String              @map("outbound_order_id") @db.Uuid
+  status          PickWaveOrderStatus @default(PLANNED)
+  sequence        Int                 @default(0)
+  metadata        Json?
+  pickedAt        DateTime?           @map("picked_at")
+  createdAt       DateTime            @default(now()) @map("created_at")
+  updatedAt       DateTime            @updatedAt @map("updated_at")
+  wave            PickWave            @relation(fields: [waveId], references: [id], onDelete: Cascade)
+  outboundOrder   OutboundOrder       @relation(fields: [outboundOrderId], references: [id], onDelete: Cascade)
+
+  @@unique([waveId, outboundOrderId])
+  @@index([warehouseId, status])
+  @@index([outboundOrderId])
+  @@map("pick_wave_orders")
+}
+
+model PickWaveTask {
+  id              String              @id @default(uuid()) @db.Uuid
+  warehouseId     String              @map("warehouse_id") @db.Uuid
+  waveId          String              @map("wave_id") @db.Uuid
+  warehouseTaskId String              @map("warehouse_task_id") @db.Uuid
+  sequence        Int                 @default(0)
+  zone            String?
+  status          WarehouseTaskStatus @default(OPEN)
+  metadata        Json?
+  createdAt       DateTime            @default(now()) @map("created_at")
+  updatedAt       DateTime            @updatedAt @map("updated_at")
+  wave            PickWave            @relation(fields: [waveId], references: [id], onDelete: Cascade)
+  warehouseTask   WarehouseTask       @relation(fields: [warehouseTaskId], references: [id], onDelete: Cascade)
+
+  @@unique([waveId, warehouseTaskId])
+  @@index([warehouseId, status])
+  @@index([warehouseTaskId])
+  @@map("pick_wave_tasks")
+}
+
+model PickCart {
+  id             String         @id @default(uuid()) @db.Uuid
+  warehouseId    String         @map("warehouse_id") @db.Uuid
+  waveId         String?        @map("wave_id") @db.Uuid
+  code           String
+  status         PickCartStatus @default(AVAILABLE)
+  assignedUserId String?        @map("assigned_user_id") @db.Uuid
+  metadata       Json?
+  createdAt      DateTime       @default(now()) @map("created_at")
+  updatedAt      DateTime       @updatedAt @map("updated_at")
+  warehouse      Warehouse      @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  wave           PickWave?      @relation(fields: [waveId], references: [id], onDelete: SetNull)
+  totes          PickTote[]
+
+  @@unique([warehouseId, code])
+  @@index([warehouseId, status])
+  @@index([waveId])
+  @@index([assignedUserId])
+  @@map("pick_carts")
+}
+
+model PickTote {
+  id              String         @id @default(uuid()) @db.Uuid
+  warehouseId     String         @map("warehouse_id") @db.Uuid
+  pickCartId      String?        @map("pick_cart_id") @db.Uuid
+  waveId          String?        @map("wave_id") @db.Uuid
+  outboundOrderId String?        @map("outbound_order_id") @db.Uuid
+  code            String
+  status          PickToteStatus @default(EMPTY)
+  capacityUnits   Int?           @map("capacity_units")
+  metadata        Json?
+  createdAt       DateTime       @default(now()) @map("created_at")
+  updatedAt       DateTime       @updatedAt @map("updated_at")
+  warehouse       Warehouse      @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  pickCart        PickCart?      @relation(fields: [pickCartId], references: [id], onDelete: SetNull)
+  wave            PickWave?      @relation(fields: [waveId], references: [id], onDelete: SetNull)
+  outboundOrder   OutboundOrder? @relation(fields: [outboundOrderId], references: [id], onDelete: SetNull)
+
+  @@unique([warehouseId, code])
+  @@index([warehouseId, status])
+  @@index([pickCartId])
+  @@index([waveId])
+  @@index([outboundOrderId])
+  @@map("pick_totes")
+}
+
+model SkuLot {
+  id                  String               @id @default(uuid()) @db.Uuid
+  warehouseId         String               @map("warehouse_id") @db.Uuid
+  ownerClientId       String?              @map("owner_client_id") @db.Uuid
+  skuId               String               @map("sku_id") @db.Uuid
+  lotCode             String               @map("lot_code")
+  batch               String?
+  supplierLot         String?              @map("supplier_lot")
+  qualityStatus       LotQualityStatus     @default(RELEASED) @map("quality_status")
+  status              LotStatus            @default(ACTIVE)
+  manufacturedAt      DateTime?            @map("manufactured_at") @db.Date
+  expiryDate          DateTime?            @map("expiry_date") @db.Date
+  receivedAt          DateTime?            @map("received_at")
+  releasedAt          DateTime?            @map("released_at")
+  quarantinedAt       DateTime?            @map("quarantined_at")
+  quarantineReason    String?              @map("quarantine_reason")
+  metadata            Json?
+  warehouse           Warehouse            @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  ownerClient         WmsClient?           @relation("SkuLotOwnerClient", fields: [ownerClientId], references: [id], onDelete: SetNull)
+  sku                 Sku                  @relation(fields: [skuId], references: [id], onDelete: Restrict)
+  stockQuants         StockQuant[]
+  serialNumbers       SerialNumber[]
+  warehouseOrderLines WarehouseOrderLine[]
+  createdAt           DateTime             @default(now()) @map("created_at")
+  updatedAt           DateTime             @updatedAt @map("updated_at")
+
+  @@unique([warehouseId, skuId, lotCode])
+  @@index([warehouseId, ownerClientId, status])
+  @@index([warehouseId, skuId, expiryDate])
+  @@index([supplierLot])
+  @@map("sku_lots")
+}
+
+model SerialNumber {
+  id                    String               @id @default(uuid()) @db.Uuid
+  warehouseId           String               @map("warehouse_id") @db.Uuid
+  ownerClientId         String?              @map("owner_client_id") @db.Uuid
+  skuId                 String               @map("sku_id") @db.Uuid
+  lotId                 String?              @map("lot_id") @db.Uuid
+  stockQuantId          String?              @map("stock_quant_id") @db.Uuid
+  serialNumber          String               @map("serial_number")
+  status                SerialNumberStatus   @default(AVAILABLE)
+  firstReceivedAt       DateTime?            @map("first_received_at")
+  lastSeenLocationId    String?              @map("last_seen_location_id") @db.Uuid
+  inboundShipmentLineId String?              @map("inbound_shipment_line_id") @db.Uuid
+  outboundOrderLineId   String?              @map("outbound_order_line_id") @db.Uuid
+  metadata              Json?
+  warehouse             Warehouse            @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  ownerClient           WmsClient?           @relation("SerialNumberOwnerClient", fields: [ownerClientId], references: [id], onDelete: SetNull)
+  sku                   Sku                  @relation(fields: [skuId], references: [id], onDelete: Restrict)
+  lot                   SkuLot?              @relation(fields: [lotId], references: [id], onDelete: SetNull)
+  stockQuant            StockQuant?          @relation(fields: [stockQuantId], references: [id], onDelete: SetNull)
+  lastSeenLocation      WarehouseLocation?   @relation("SerialNumberLastSeenLocation", fields: [lastSeenLocationId], references: [id], onDelete: SetNull)
+  inboundShipmentLine   InboundShipmentLine? @relation(fields: [inboundShipmentLineId], references: [id], onDelete: SetNull)
+  outboundOrderLine     OutboundOrderLine?   @relation(fields: [outboundOrderLineId], references: [id], onDelete: SetNull)
+  events                SerialNumberEvent[]
+  createdAt             DateTime             @default(now()) @map("created_at")
+  updatedAt             DateTime             @updatedAt @map("updated_at")
+
+  @@unique([warehouseId, serialNumber])
+  @@index([warehouseId, skuId, status])
+  @@index([lotId])
+  @@index([stockQuantId])
+  @@map("serial_numbers")
+}
+
+model SerialNumberEvent {
+  id             String             @id @default(uuid()) @db.Uuid
+  warehouseId    String             @map("warehouse_id") @db.Uuid
+  ownerClientId  String?            @map("owner_client_id") @db.Uuid
+  serialNumberId String             @map("serial_number_id") @db.Uuid
+  eventType      String             @map("event_type")
+  fromLocationId String?            @map("from_location_id") @db.Uuid
+  toLocationId   String?            @map("to_location_id") @db.Uuid
+  stockQuantId   String?            @map("stock_quant_id") @db.Uuid
+  actorUserId    String?            @map("actor_user_id") @db.Uuid
+  referenceType  String?            @map("reference_type")
+  referenceId    String?            @map("reference_id")
+  metadata       Json?
+  occurredAt     DateTime           @default(now()) @map("occurred_at")
+  createdAt      DateTime           @default(now()) @map("created_at")
+  warehouse      Warehouse          @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  ownerClient    WmsClient?         @relation("SerialNumberEventOwnerClient", fields: [ownerClientId], references: [id], onDelete: SetNull)
+  serialNumber   SerialNumber       @relation(fields: [serialNumberId], references: [id], onDelete: Cascade)
+  fromLocation   WarehouseLocation? @relation("FromLocationSerialNumberEvents", fields: [fromLocationId], references: [id], onDelete: SetNull)
+  toLocation     WarehouseLocation? @relation("ToLocationSerialNumberEvents", fields: [toLocationId], references: [id], onDelete: SetNull)
+  stockQuant     StockQuant?        @relation(fields: [stockQuantId], references: [id], onDelete: SetNull)
+  actor          User?              @relation("ActorSerialNumberEvents", fields: [actorUserId], references: [id], onDelete: SetNull)
+
+  @@index([serialNumberId, occurredAt])
+  @@index([warehouseId, eventType, occurredAt])
+  @@map("serial_number_events")
+}
+
+model WarehouseOrder {
+  id             String               @id @default(uuid()) @db.Uuid
+  warehouseId    String               @map("warehouse_id") @db.Uuid
+  ownerClientId  String?              @map("owner_client_id") @db.Uuid
+  orderNumber    String               @map("order_number")
+  orderType      WarehouseOrderType   @default(MOVE) @map("order_type")
+  status         WarehouseOrderStatus @default(DRAFT)
+  priority       Int                  @default(100)
+  sourceType     String?              @map("source_type")
+  sourceId       String?              @map("source_id")
+  fromLocationId String?              @map("from_location_id") @db.Uuid
+  toLocationId   String?              @map("to_location_id") @db.Uuid
+  dueAt          DateTime?            @map("due_at")
+  releasedAt     DateTime?            @map("released_at")
+  completedAt    DateTime?            @map("completed_at")
+  cancelledAt    DateTime?            @map("cancelled_at")
+  metadata       Json?
+  warehouse      Warehouse            @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  ownerClient    WmsClient?           @relation("WarehouseOrderOwnerClient", fields: [ownerClientId], references: [id], onDelete: SetNull)
+  fromLocation   WarehouseLocation?   @relation("FromLocationWarehouseOrders", fields: [fromLocationId], references: [id], onDelete: SetNull)
+  toLocation     WarehouseLocation?   @relation("ToLocationWarehouseOrders", fields: [toLocationId], references: [id], onDelete: SetNull)
+  lines          WarehouseOrderLine[]
+  tasks          WarehouseOrderTask[]
+  createdAt      DateTime             @default(now()) @map("created_at")
+  updatedAt      DateTime             @updatedAt @map("updated_at")
+
+  @@unique([warehouseId, orderNumber])
+  @@index([warehouseId, ownerClientId, status])
+  @@index([warehouseId, dueAt])
+  @@map("warehouse_orders")
+}
+
+model WarehouseOrderLine {
+  id                String                   @id @default(uuid()) @db.Uuid
+  warehouseId       String                   @map("warehouse_id") @db.Uuid
+  ownerClientId     String?                  @map("owner_client_id") @db.Uuid
+  warehouseOrderId  String                   @map("warehouse_order_id") @db.Uuid
+  lineNumber        String                   @map("line_number")
+  skuId             String?                  @map("sku_id") @db.Uuid
+  lotId             String?                  @map("lot_id") @db.Uuid
+  requestedQuantity Int                      @default(1) @map("requested_quantity")
+  allocatedQuantity Int                      @default(0) @map("allocated_quantity")
+  completedQuantity Int                      @default(0) @map("completed_quantity")
+  serialRequired    Boolean                  @default(false) @map("serial_required")
+  status            WarehouseOrderLineStatus @default(OPEN)
+  metadata          Json?
+  warehouse         Warehouse                @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  ownerClient       WmsClient?               @relation("WarehouseOrderLineOwnerClient", fields: [ownerClientId], references: [id], onDelete: SetNull)
+  warehouseOrder    WarehouseOrder           @relation(fields: [warehouseOrderId], references: [id], onDelete: Cascade)
+  sku               Sku?                     @relation(fields: [skuId], references: [id], onDelete: SetNull)
+  lot               SkuLot?                  @relation(fields: [lotId], references: [id], onDelete: SetNull)
+  tasks             WarehouseOrderTask[]
+  createdAt         DateTime                 @default(now()) @map("created_at")
+  updatedAt         DateTime                 @updatedAt @map("updated_at")
+
+  @@unique([warehouseOrderId, lineNumber])
+  @@index([warehouseId, status])
+  @@index([skuId])
+  @@map("warehouse_order_lines")
+}
+
+model WarehouseOrderTask {
+  id                   String              @id @default(uuid()) @db.Uuid
+  warehouseId          String              @map("warehouse_id") @db.Uuid
+  ownerClientId        String?             @map("owner_client_id") @db.Uuid
+  warehouseOrderId     String              @map("warehouse_order_id") @db.Uuid
+  warehouseOrderLineId String?             @map("warehouse_order_line_id") @db.Uuid
+  warehouseTaskId      String              @map("warehouse_task_id") @db.Uuid
+  warehouse            Warehouse           @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  ownerClient          WmsClient?          @relation("WarehouseOrderTaskOwnerClient", fields: [ownerClientId], references: [id], onDelete: SetNull)
+  warehouseOrder       WarehouseOrder      @relation(fields: [warehouseOrderId], references: [id], onDelete: Cascade)
+  warehouseOrderLine   WarehouseOrderLine? @relation(fields: [warehouseOrderLineId], references: [id], onDelete: Cascade)
+  warehouseTask        WarehouseTask       @relation(fields: [warehouseTaskId], references: [id], onDelete: Cascade)
+  createdAt            DateTime            @default(now()) @map("created_at")
+
+  @@unique([warehouseOrderId, warehouseTaskId])
+  @@index([warehouseTaskId])
+  @@map("warehouse_order_tasks")
+}
+
+model RefreshTokenSession {
+  id                  String                    @id @default(uuid()) @db.Uuid
+  userId              String                    @map("user_id") @db.Uuid
+  tokenHash           String                    @unique @map("token_hash")
+  familyId            String                    @default(uuid()) @map("family_id") @db.Uuid
+  status              RefreshTokenSessionStatus @default(ACTIVE)
+  expiresAt           DateTime                  @map("expires_at")
+  revokedAt           DateTime?                 @map("revoked_at")
+  replacedBySessionId String?                   @map("replaced_by_session_id") @db.Uuid
+  ipAddress           String?                   @map("ip_address")
+  userAgent           String?                   @map("user_agent")
+  metadata            Json?
+  user                User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  replacedBySession   RefreshTokenSession?      @relation("RefreshTokenRotation", fields: [replacedBySessionId], references: [id], onDelete: SetNull)
+  previousSessions    RefreshTokenSession[]     @relation("RefreshTokenRotation")
+  createdAt           DateTime                  @default(now()) @map("created_at")
+  updatedAt           DateTime                  @updatedAt @map("updated_at")
+
+  @@index([userId, status, expiresAt])
+  @@index([familyId, createdAt])
+  @@map("refresh_token_sessions")
+}
+
+model MfaTotpSecret {
+  id               String    @id @default(uuid()) @db.Uuid
+  userId           String    @map("user_id") @db.Uuid
+  secretCiphertext Json      @map("secret_ciphertext")
+  secretLast4      String?   @map("secret_last4")
+  label            String?
+  verifiedAt       DateTime? @map("verified_at")
+  disabledAt       DateTime? @map("disabled_at")
+  metadata         Json?
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+
+  @@index([userId, verifiedAt])
+  @@map("mfa_totp_secrets")
+}
+
+model AuthLoginAttempt {
+  id                String    @id @default(uuid()) @db.Uuid
+  emailHash         String    @unique @map("email_hash")
+  userId            String?   @map("user_id") @db.Uuid
+  failedCount       Int       @default(0) @map("failed_count")
+  firstFailedAt     DateTime? @map("first_failed_at")
+  lastFailedAt      DateTime? @map("last_failed_at")
+  lockedUntil       DateTime? @map("locked_until")
+  lastIpHash        String?   @map("last_ip_hash")
+  lastUserAgentHash String?   @map("last_user_agent_hash")
+  metadata          Json?
+  user              User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  @@index([lockedUntil])
+  @@index([userId, lastFailedAt])
+  @@map("auth_login_attempts")
+}
+
+model RateLimitBucket {
+  key       String   @id
+  count     Int      @default(0)
+  resetAt   DateTime @map("reset_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([resetAt])
+  @@map("rate_limit_buckets")
+}
+
+model CarrierCredential {
+  id                String                  @id @default(uuid()) @db.Uuid
+  warehouseId       String                  @map("warehouse_id") @db.Uuid
+  carrier           String
+  environment       String                  @default("TEST")
+  status            CarrierCredentialStatus @default(ACTIVE)
+  accountNumber     String?                 @map("account_number")
+  secretCiphertext  Json?                   @map("secret_ciphertext")
+  secretFingerprint String?                 @map("secret_fingerprint")
+  secretLast4       String?                 @map("secret_last4")
+  keyVersion        String                  @default("v1") @map("key_version")
+  lastRotatedAt     DateTime?               @map("last_rotated_at")
+  metadata          Json?
+  warehouse         Warehouse               @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  createdAt         DateTime                @default(now()) @map("created_at")
+  updatedAt         DateTime                @updatedAt @map("updated_at")
+
+  @@unique([warehouseId, carrier, environment])
+  @@index([warehouseId, status])
+  @@index([carrier, environment])
+  @@map("carrier_credentials")
+}
+
+model CarrierTrackingEvent {
+  id              String                @id @default(uuid()) @db.Uuid
+  warehouseId     String                @map("warehouse_id") @db.Uuid
+  carrier         String
+  labelReference  String?               @map("label_reference")
+  trackingNumber  String?               @map("tracking_number")
+  shipmentId      String?               @map("shipment_id") @db.Uuid
+  packageId       String?               @map("package_id") @db.Uuid
+  externalEventId String?               @map("external_event_id")
+  status          CarrierTrackingStatus @default(UNKNOWN)
+  eventCode       String?               @map("event_code")
+  message         String?
+  payload         Json?
+  occurredAt      DateTime              @default(now()) @map("occurred_at")
+  createdAt       DateTime              @default(now()) @map("created_at")
+
+  @@unique([warehouseId, carrier, externalEventId], map: "carrier_tracking_events_warehouse_carrier_external_key")
+  @@index([warehouseId, carrier, occurredAt])
+  @@index([trackingNumber, occurredAt])
+  @@index([labelReference, occurredAt])
+  @@index([shipmentId, occurredAt])
+  @@index([packageId, occurredAt])
+  @@index([status, occurredAt])
+  @@map("carrier_tracking_events")
+}
+
+model SlottingRule {
+  id                  String                 @id @default(uuid()) @db.Uuid
+  warehouseId         String                 @map("warehouse_id") @db.Uuid
+  code                String
+  status              SlottingRuleStatus     @default(ACTIVE)
+  zone                String?
+  minVelocityScore    Int?                   @map("min_velocity_score")
+  maxVelocityScore    Int?                   @map("max_velocity_score")
+  targetLocationType  WarehouseLocationType? @map("target_location_type")
+  maxPickSequence     Int?                   @map("max_pick_sequence")
+  minPickFaceQuantity Int?                   @map("min_pick_face_quantity")
+  metadata            Json?
+  warehouse           Warehouse              @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  createdAt           DateTime               @default(now()) @map("created_at")
+  updatedAt           DateTime               @updatedAt @map("updated_at")
+
+  @@unique([warehouseId, code])
+  @@index([warehouseId, status])
+  @@index([warehouseId, zone])
+  @@map("slotting_rules")
+}
+
+model SkuVelocity {
+  id                       String    @id @default(uuid()) @db.Uuid
+  warehouseId              String    @map("warehouse_id") @db.Uuid
+  skuId                    String?   @map("sku_id") @db.Uuid
+  skuCode                  String    @map("sku_code")
+  picksLast30Days          Int       @default(0) @map("picks_last_30_days")
+  unitsPickedLast30Days    Int       @default(0) @map("units_picked_last_30_days")
+  replenishmentsLast30Days Int       @default(0) @map("replenishments_last_30_days")
+  velocityScore            Int       @default(0) @map("velocity_score")
+  abcClass                 String?   @map("abc_class")
+  metadata                 Json?
+  lastCalculatedAt         DateTime  @default(now()) @map("last_calculated_at")
+  createdAt                DateTime  @default(now()) @map("created_at")
+  updatedAt                DateTime  @updatedAt @map("updated_at")
+  warehouse                Warehouse @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  sku                      Sku?      @relation(fields: [skuId], references: [id], onDelete: SetNull)
+
+  @@unique([warehouseId, skuCode])
+  @@index([warehouseId, velocityScore])
+  @@index([skuId])
+  @@map("sku_velocities")
+}
+
+model SlottingRecommendation {
+  id                    String                       @id @default(uuid()) @db.Uuid
+  warehouseId           String                       @map("warehouse_id") @db.Uuid
+  skuId                 String?                      @map("sku_id") @db.Uuid
+  skuCode               String                       @map("sku_code")
+  fromLocationId        String?                      @map("from_location_id") @db.Uuid
+  toLocationId          String?                      @map("to_location_id") @db.Uuid
+  status                SlottingRecommendationStatus @default(OPEN)
+  reason                String
+  priority              Int                          @default(100)
+  velocityScore         Int                          @default(0) @map("velocity_score")
+  expectedTravelSavings Int?                         @map("expected_travel_savings")
+  message               String?
+  metadata              Json?
+  appliedAt             DateTime?                    @map("applied_at")
+  dismissedAt           DateTime?                    @map("dismissed_at")
+  createdAt             DateTime                     @default(now()) @map("created_at")
+  updatedAt             DateTime                     @updatedAt @map("updated_at")
+  warehouse             Warehouse                    @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  sku                   Sku?                         @relation(fields: [skuId], references: [id], onDelete: SetNull)
+  fromLocation          WarehouseLocation?           @relation("SlottingRecommendationFromLocation", fields: [fromLocationId], references: [id], onDelete: SetNull)
+  toLocation            WarehouseLocation?           @relation("SlottingRecommendationToLocation", fields: [toLocationId], references: [id], onDelete: SetNull)
+
+  @@index([warehouseId, status, priority])
+  @@index([warehouseId, skuCode])
+  @@index([fromLocationId])
+  @@index([toLocationId])
+  @@map("slotting_recommendations")
+}
+
+model IntegrationEndpoint {
+  id           String                   @id @default(uuid()) @db.Uuid
+  code         String                   @unique
+  name         String
+  type         String
+  baseUrl      String                   @map("base_url")
+  authType     String                   @default("NONE") @map("auth_type")
+  status       IntegrationStatus        @default(INACTIVE)
+  config       Json?
+  dispatchLogs IntegrationDispatchLog[]
+  createdAt    DateTime                 @default(now()) @map("created_at")
+  updatedAt    DateTime                 @updatedAt @map("updated_at")
+
+  @@index([status])
+  @@index([type, status])
+  @@map("integration_endpoints")
+}
+
+model IntegrationDispatchLog {
+  id              String               @id @default(uuid()) @db.Uuid
+  endpointId      String?              @map("endpoint_id") @db.Uuid
+  outboxEventId   String?              @map("outbox_event_id") @db.Uuid
+  eventType       String               @map("event_type")
+  destinationUrl  String               @map("destination_url")
+  requestMethod   String               @default("POST") @map("request_method")
+  statusCode      Int?                 @map("status_code")
+  success         Boolean              @default(false)
+  attempts        Int                  @default(1)
+  errorMessage    String?              @map("error_message")
+  requestBodyHash String?              @map("request_body_hash")
+  responseBody    String?              @map("response_body")
+  metadata        Json?
+  endpoint        IntegrationEndpoint? @relation(fields: [endpointId], references: [id], onDelete: SetNull)
+  createdAt       DateTime             @default(now()) @map("created_at")
+
+  @@index([endpointId, createdAt])
+  @@index([outboxEventId])
+  @@index([eventType, createdAt])
+  @@index([success, createdAt])
+  @@map("integration_dispatch_logs")
+}
+
+model AuditLog {
+  id           String     @id @default(uuid()) @db.Uuid
+  actorUserId  String?    @map("actor_user_id") @db.Uuid
+  warehouseId  String?    @map("warehouse_id") @db.Uuid
+  action       String
+  resourceType String     @map("resource_type")
+  resourceId   String?    @map("resource_id")
+  metadata     Json?
+  actor        User?      @relation("ActorAuditLogs", fields: [actorUserId], references: [id], onDelete: SetNull)
+  warehouse    Warehouse? @relation(fields: [warehouseId], references: [id], onDelete: SetNull)
+  createdAt    DateTime   @default(now()) @map("created_at")
+
+  @@index([actorUserId, createdAt])
+  @@index([warehouseId, createdAt])
+  @@index([resourceType, resourceId])
+  @@map("audit_logs")
+}
+
+model ProductCategory {
+  id        String   @id @default(uuid()) @db.Uuid
+  parentId  String?  @map("parent_id") @db.Uuid
+  code      String
+  name      String
+  status    String   @default("ACTIVE")
+  metadata  Json?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([code])
+  @@index([parentId])
+  @@index([status])
+  @@map("product_categories")
+}
+
+model ProductCategoryLink {
+  id         String   @id @default(uuid()) @db.Uuid
+  productId  String   @map("product_id") @db.Uuid
+  categoryId String   @map("category_id") @db.Uuid
+  isPrimary  Boolean  @default(false) @map("is_primary")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@unique([productId, categoryId])
+  @@index([categoryId])
+  @@map("product_category_links")
+}
+
+model ProductUom {
+  id        String   @id @default(uuid()) @db.Uuid
+  code      String
+  name      String
+  kind      String   @default("EACH")
+  decimals  Int      @default(0)
+  isActive  Boolean  @default(true) @map("is_active")
+  metadata  Json?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([code])
+  @@index([kind, isActive])
+  @@map("product_uoms")
+}
+
+model ProductUomConversion {
+  id         String   @id @default(uuid()) @db.Uuid
+  fromUom    String   @map("from_uom")
+  toUom      String   @map("to_uom")
+  multiplier Decimal  @db.Decimal(18, 6)
+  productId  String?  @map("product_id") @db.Uuid
+  skuId      String?  @map("sku_id") @db.Uuid
+  isActive   Boolean  @default(true) @map("is_active")
+  metadata   Json?
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@unique([fromUom, toUom, productId, skuId])
+  @@index([skuId, isActive])
+  @@index([productId, isActive])
+  @@map("product_uom_conversions")
+}
+
+model SkuBarcode {
+  id          String   @id @default(uuid()) @db.Uuid
+  warehouseId String?  @map("warehouse_id") @db.Uuid
+  skuId       String   @map("sku_id") @db.Uuid
+  barcode     String
+  barcodeType String   @default("INTERNAL") @map("barcode_type")
+  isPrimary   Boolean  @default(false) @map("is_primary")
+  status      String   @default("ACTIVE")
+  metadata    Json?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@unique([skuId, barcode])
+  @@index([warehouseId, barcode])
+  @@index([barcodeType])
+  @@map("sku_barcodes")
+}
+
+model SkuStorageRequirement {
+  id                    String   @id @default(uuid()) @db.Uuid
+  skuId                 String   @unique @map("sku_id") @db.Uuid
+  temperatureMinCelsius Decimal? @map("temperature_min_celsius") @db.Decimal(8, 3)
+  temperatureMaxCelsius Decimal? @map("temperature_max_celsius") @db.Decimal(8, 3)
+  fragile               Boolean  @default(false)
+  hazardous             Boolean  @default(false)
+  oversized             Boolean  @default(false)
+  stackable             Boolean  @default(true)
+  requirements          Json?
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  @@index([fragile, hazardous, oversized])
+  @@map("sku_storage_requirements")
+}
+
+model SkuPackagingLevel {
+  id              String   @id @default(uuid()) @db.Uuid
+  skuId           String   @map("sku_id") @db.Uuid
+  levelCode       String   @map("level_code")
+  uom             String
+  unitsPerLevel   Int      @map("units_per_level")
+  parentLevelCode String?  @map("parent_level_code")
+  weightGrams     Int?     @map("weight_grams")
+  lengthMm        Int?     @map("length_mm")
+  widthMm         Int?     @map("width_mm")
+  heightMm        Int?     @map("height_mm")
+  volumeCm3       Int?     @map("volume_cm3")
+  barcode         String?
+  isDefault       Boolean  @default(false) @map("is_default")
+  metadata        Json?
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@unique([skuId, levelCode])
+  @@index([skuId, unitsPerLevel])
+  @@map("sku_packaging_levels")
+}
+
+model ProductClientOwnership {
+  id                    String   @id @default(uuid()) @db.Uuid
+  productId             String   @map("product_id") @db.Uuid
+  clientId              String   @map("client_id") @db.Uuid
+  externalArticleNumber String?  @map("external_article_number")
+  status                String   @default("ACTIVE")
+  metadata              Json?
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  @@unique([productId, clientId])
+  @@index([clientId, status])
+  @@map("product_client_ownerships")
+}
+
+model ProductDocumentMetadata {
+  id             String   @id @default(uuid()) @db.Uuid
+  productId      String   @map("product_id") @db.Uuid
+  documentType   String   @map("document_type")
+  title          String
+  uri            String
+  mimeType       String?  @map("mime_type")
+  checksumSha256 String?  @map("checksum_sha256")
+  metadata       Json?
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  @@index([productId, documentType])
+  @@map("product_document_metadata")
+}
+
+model ReturnOrder {
+  id                String   @id @default(uuid()) @db.Uuid
+  warehouseId       String   @map("warehouse_id") @db.Uuid
+  ownerClientId     String?  @map("owner_client_id") @db.Uuid
+  rmaNumber         String   @map("rma_number")
+  status            String   @default("CREATED")
+  customerReference String?  @map("customer_reference")
+  externalReference String?  @map("external_reference")
+  reasonCode        String?  @map("reason_code")
+  metadata          Json?
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  @@unique([warehouseId, rmaNumber])
+  @@index([warehouseId, ownerClientId, status])
+  @@index([externalReference])
+  @@map("return_orders")
+}
+
+model ReturnOrderLine {
+  id                String   @id @default(uuid()) @db.Uuid
+  returnOrderId     String   @map("return_order_id") @db.Uuid
+  lineNumber        String   @map("line_number")
+  skuId             String   @map("sku_id") @db.Uuid
+  expectedQuantity  Int      @map("expected_quantity")
+  receivedQuantity  Int      @default(0) @map("received_quantity")
+  inspectedQuantity Int      @default(0) @map("inspected_quantity")
+  disposition       String?
+  status            String   @default("OPEN")
+  metadata          Json?
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  @@unique([returnOrderId, lineNumber])
+  @@index([skuId, status])
+  @@map("return_order_lines")
+}
+
+model ReturnInspection {
+  id                String   @id @default(uuid()) @db.Uuid
+  warehouseId       String   @map("warehouse_id") @db.Uuid
+  returnOrderId     String   @map("return_order_id") @db.Uuid
+  returnOrderLineId String   @map("return_order_line_id") @db.Uuid
+  disposition       String
+  inspectedQuantity Int      @map("inspected_quantity")
+  acceptedQuantity  Int      @default(0) @map("accepted_quantity")
+  rejectedQuantity  Int      @default(0) @map("rejected_quantity")
+  stockQuantId      String?  @map("stock_quant_id") @db.Uuid
+  notes             String?
+  metadata          Json?
+  createdByUserId   String?  @map("created_by_user_id") @db.Uuid
+  createdAt         DateTime @default(now()) @map("created_at")
+
+  @@index([warehouseId, createdAt])
+  @@index([returnOrderLineId])
+  @@map("return_inspections")
+}
+
+model QualityInspection {
+  id                String    @id @default(uuid()) @db.Uuid
+  warehouseId       String    @map("warehouse_id") @db.Uuid
+  ownerClientId     String?   @map("owner_client_id") @db.Uuid
+  skuId             String?   @map("sku_id") @db.Uuid
+  lotId             String?   @map("lot_id") @db.Uuid
+  stockQuantId      String?   @map("stock_quant_id") @db.Uuid
+  inspectionNumber  String    @map("inspection_number")
+  status            String    @default("OPEN")
+  result            String?
+  sampleQuantity    Int       @default(1) @map("sample_quantity")
+  checklist         Json?
+  reasonCode        String?   @map("reason_code")
+  notes             String?
+  createdByUserId   String?   @map("created_by_user_id") @db.Uuid
+  completedByUserId String?   @map("completed_by_user_id") @db.Uuid
+  completedAt       DateTime? @map("completed_at")
+  metadata          Json?
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  @@unique([warehouseId, inspectionNumber])
+  @@index([warehouseId, status])
+  @@index([skuId, lotId])
+  @@index([stockQuantId])
+  @@map("quality_inspections")
+}
+
+model QualitySamplingRule {
+  id                String   @id @default(uuid()) @db.Uuid
+  warehouseId       String   @map("warehouse_id") @db.Uuid
+  clientId          String?  @map("client_id") @db.Uuid
+  skuId             String?  @map("sku_id") @db.Uuid
+  lotStatus         String?  @map("lot_status")
+  reasonCode        String?  @map("reason_code")
+  samplePercent     Decimal  @map("sample_percent") @db.Decimal(5, 2)
+  minSampleQuantity Int      @default(1) @map("min_sample_quantity")
+  maxSampleQuantity Int?     @map("max_sample_quantity")
+  isActive          Boolean  @default(true) @map("is_active")
+  metadata          Json?
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  @@index([warehouseId, isActive])
+  @@index([clientId, skuId])
+  @@map("quality_sampling_rules")
+}
+
+model ExternalSystem {
+  id            String   @id @default(uuid()) @db.Uuid
+  code          String
+  name          String
+  systemType    String   @map("system_type")
+  status        String   @default("ACTIVE")
+  ownerClientId String?  @map("owner_client_id") @db.Uuid
+  config        Json?
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@unique([code])
+  @@index([systemType, status])
+  @@index([ownerClientId])
+  @@map("external_systems")
+}
+
+model ExternalIdMapping {
+  id               String   @id @default(uuid()) @db.Uuid
+  externalSystemId String   @map("external_system_id") @db.Uuid
+  warehouseId      String?  @map("warehouse_id") @db.Uuid
+  ownerClientId    String?  @map("owner_client_id") @db.Uuid
+  resourceType     String   @map("resource_type")
+  resourceId       String   @map("resource_id")
+  externalId       String   @map("external_id")
+  externalType     String?  @map("external_type")
+  metadata         Json?
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  @@unique([externalSystemId, resourceType, externalId])
+  @@index([resourceType, resourceId])
+  @@index([warehouseId, ownerClientId])
+  @@map("external_id_mappings")
+}
+
+model IntegrationDeadLetter {
+  id            String    @id @default(uuid()) @db.Uuid
+  endpointId    String?   @map("endpoint_id") @db.Uuid
+  outboxEventId String?   @map("outbox_event_id") @db.Uuid
+  inboxEventId  String?   @map("inbox_event_id") @db.Uuid
+  eventType     String    @map("event_type")
+  resourceType  String?   @map("resource_type")
+  resourceId    String?   @map("resource_id")
+  status        String    @default("OPEN")
+  errorMessage  String    @map("error_message")
+  attempts      Int       @default(1)
+  nextRetryAt   DateTime? @map("next_retry_at")
+  payload       Json?
+  metadata      Json?
+  fingerprint   String
+  resolvedAt    DateTime? @map("resolved_at")
+  replayedAt    DateTime? @map("replayed_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  @@unique([fingerprint])
+  @@index([status, createdAt])
+  @@index([eventType, createdAt])
+  @@index([outboxEventId])
+  @@map("integration_dead_letters")
+}
+
+model DomainEvent {
+  id            String    @id @default(uuid()) @db.Uuid
+  warehouseId   String    @map("warehouse_id") @db.Uuid
+  ownerClientId String?   @map("owner_client_id") @db.Uuid
+  eventType     String    @map("event_type")
+  resourceType  String    @map("resource_type")
+  resourceId    String    @map("resource_id")
+  schemaVersion Int       @default(1) @map("schema_version")
+  eventKey      String    @map("event_key")
+  payload       Json?
+  metadata      Json?
+  occurredAt    DateTime  @default(now()) @map("occurred_at")
+  publishedAt   DateTime? @map("published_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  @@unique([eventKey])
+  @@index([warehouseId, eventType, createdAt])
+  @@index([resourceType, resourceId])
+  @@index([ownerClientId, createdAt])
+  @@map("domain_events")
+}
+
+model WebhookSubscription {
+  id            String   @id @default(uuid()) @db.Uuid
+  warehouseId   String   @map("warehouse_id") @db.Uuid
+  ownerClientId String?  @map("owner_client_id") @db.Uuid
+  name          String
+  targetUrl     String   @map("target_url")
+  eventTypes    String[] @default([]) @map("event_types")
+  status        String   @default("ACTIVE")
+  secretRef     String?  @map("secret_ref")
+  metadata      Json?
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@unique([warehouseId, name])
+  @@index([warehouseId, status])
+  @@map("webhook_subscriptions")
+}
+
+model WebhookDeliveryAttempt {
+  id                 String    @id @default(uuid()) @db.Uuid
+  warehouseId        String    @map("warehouse_id") @db.Uuid
+  ownerClientId      String?   @map("owner_client_id") @db.Uuid
+  subscriptionId     String    @map("subscription_id") @db.Uuid
+  domainEventId      String    @map("domain_event_id") @db.Uuid
+  status             String    @default("PENDING")
+  attemptNumber      Int       @default(1) @map("attempt_number")
+  requestSignature   String?   @map("request_signature")
+  responseStatusCode Int?      @map("response_status_code")
+  errorMessage       String?   @map("error_message")
+  nextRetryAt        DateTime? @map("next_retry_at")
+  metadata           Json?
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+
+  @@unique([subscriptionId, domainEventId, attemptNumber])
+  @@index([status, nextRetryAt, createdAt])
+  @@index([domainEventId])
+  @@map("webhook_delivery_attempts")
+}
+
+model AutomationDevice {
+  id              String    @id @default(uuid()) @db.Uuid
+  warehouseId     String    @map("warehouse_id") @db.Uuid
+  ownerClientId   String?   @map("owner_client_id") @db.Uuid
+  code            String
+  deviceType      String    @map("device_type")
+  status          String    @default("ACTIVE")
+  zone            String?
+  lastHeartbeatAt DateTime? @map("last_heartbeat_at")
+  capabilities    Json?
+  metadata        Json?
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  @@unique([warehouseId, code])
+  @@index([warehouseId, deviceType, status])
+  @@index([lastHeartbeatAt])
+  @@map("automation_devices")
+}
+
+model AutomationCommand {
+  id            String    @id @default(uuid()) @db.Uuid
+  warehouseId   String    @map("warehouse_id") @db.Uuid
+  ownerClientId String?   @map("owner_client_id") @db.Uuid
+  deviceId      String?   @map("device_id") @db.Uuid
+  commandType   String    @map("command_type")
+  status        String    @default("QUEUED")
+  priority      Int       @default(50)
+  correlationId String?   @map("correlation_id")
+  payload       Json?
+  attempts      Int       @default(0)
+  notBeforeAt   DateTime? @map("not_before_at")
+  claimedAt     DateTime? @map("claimed_at")
+  completedAt   DateTime? @map("completed_at")
+  errorMessage  String?   @map("error_message")
+  metadata      Json?
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  @@index([warehouseId, status, priority, createdAt])
+  @@index([deviceId, status])
+  @@map("automation_commands")
+}
+
+model AutomationEvent {
+  id            String   @id @default(uuid()) @db.Uuid
+  warehouseId   String   @map("warehouse_id") @db.Uuid
+  ownerClientId String?  @map("owner_client_id") @db.Uuid
+  deviceId      String?  @map("device_id") @db.Uuid
+  commandId     String?  @map("command_id") @db.Uuid
+  eventType     String   @map("event_type")
+  severity      String   @default("INFO")
+  payload       Json?
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@index([deviceId, createdAt])
+  @@index([warehouseId, eventType, createdAt])
+  @@map("automation_events")
+}
+
+model DockDoor {
+  id            String   @id @default(uuid()) @db.Uuid
+  warehouseId   String   @map("warehouse_id") @db.Uuid
+  ownerClientId String?  @map("owner_client_id") @db.Uuid
+  code          String
+  status        String   @default("ACTIVE")
+  doorType      String   @default("STANDARD") @map("door_type")
+  zone          String?
+  metadata      Json?
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@unique([warehouseId, code])
+  @@index([warehouseId, status])
+  @@map("dock_doors")
+}
+
+model YardTrailer {
+  id            String    @id @default(uuid()) @db.Uuid
+  warehouseId   String    @map("warehouse_id") @db.Uuid
+  ownerClientId String?   @map("owner_client_id") @db.Uuid
+  trailerNumber String    @map("trailer_number")
+  carrier       String?
+  status        String    @default("EXPECTED")
+  dockDoorId    String?   @map("dock_door_id") @db.Uuid
+  checkedInAt   DateTime? @map("checked_in_at")
+  checkedOutAt  DateTime? @map("checked_out_at")
+  dwellMinutes  Int?      @map("dwell_minutes")
+  metadata      Json?
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  @@unique([warehouseId, trailerNumber])
+  @@index([warehouseId, status])
+  @@index([dockDoorId, status])
+  @@map("yard_trailers")
+}
+
+model DockAppointment {
+  id                String   @id @default(uuid()) @db.Uuid
+  warehouseId       String   @map("warehouse_id") @db.Uuid
+  ownerClientId     String?  @map("owner_client_id") @db.Uuid
+  appointmentNumber String   @map("appointment_number")
+  direction         String
+  status            String   @default("SCHEDULED")
+  plannedStartAt    DateTime @map("planned_start_at")
+  plannedEndAt      DateTime @map("planned_end_at")
+  dockDoorId        String?  @map("dock_door_id") @db.Uuid
+  trailerId         String?  @map("trailer_id") @db.Uuid
+  carrier           String?
+  externalReference String?  @map("external_reference")
+  metadata          Json?
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  @@unique([warehouseId, appointmentNumber])
+  @@index([warehouseId, status, plannedStartAt])
+  @@index([dockDoorId, plannedStartAt])
+  @@map("dock_appointments")
+}
+
+model CrossDockPlan {
+  id                String   @id @default(uuid()) @db.Uuid
+  warehouseId       String   @map("warehouse_id") @db.Uuid
+  ownerClientId     String?  @map("owner_client_id") @db.Uuid
+  status            String   @default("PLANNED")
+  priority          Int      @default(50)
+  inboundShipmentId String?  @map("inbound_shipment_id") @db.Uuid
+  outboundOrderId   String?  @map("outbound_order_id") @db.Uuid
+  reasonCode        String?  @map("reason_code")
+  metadata          Json?
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  @@index([warehouseId, status, priority, createdAt])
+  @@index([inboundShipmentId, outboundOrderId])
+  @@map("cross_dock_plans")
+}
+
+model CrossDockPlanLine {
+  id                String   @id @default(uuid()) @db.Uuid
+  warehouseId       String   @map("warehouse_id") @db.Uuid
+  ownerClientId     String?  @map("owner_client_id") @db.Uuid
+  planId            String   @map("plan_id") @db.Uuid
+  skuId             String   @map("sku_id") @db.Uuid
+  lotId             String?  @map("lot_id") @db.Uuid
+  expectedQuantity  Int      @map("expected_quantity")
+  allocatedQuantity Int      @default(0) @map("allocated_quantity")
+  fromLocationId    String?  @map("from_location_id") @db.Uuid
+  toLocationId      String?  @map("to_location_id") @db.Uuid
+  metadata          Json?
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  @@index([planId])
+  @@index([skuId, lotId])
+  @@map("cross_dock_plan_lines")
+}
+
+model VasServiceCatalog {
+  id                     String   @id @default(uuid()) @db.Uuid
+  warehouseId            String   @map("warehouse_id") @db.Uuid
+  ownerClientId          String?  @map("owner_client_id") @db.Uuid
+  code                   String
+  name                   String
+  serviceType            String   @map("service_type")
+  status                 String   @default("ACTIVE")
+  defaultDurationSeconds Int?     @map("default_duration_seconds")
+  instructions           String?
+  metadata               Json?
+  createdAt              DateTime @default(now()) @map("created_at")
+  updatedAt              DateTime @updatedAt @map("updated_at")
+
+  @@unique([warehouseId, code])
+  @@index([warehouseId, serviceType, status])
+  @@map("vas_service_catalog")
+}
+
+model KitBomHeader {
+  id            String   @id @default(uuid()) @db.Uuid
+  warehouseId   String   @map("warehouse_id") @db.Uuid
+  ownerClientId String?  @map("owner_client_id") @db.Uuid
+  kitSkuId      String   @map("kit_sku_id") @db.Uuid
+  code          String
+  status        String   @default("ACTIVE")
+  version       Int      @default(1)
+  metadata      Json?
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@unique([warehouseId, code, version])
+  @@index([kitSkuId, status])
+  @@map("kit_bom_headers")
+}
+
+model KitBomLine {
+  id             String   @id @default(uuid()) @db.Uuid
+  warehouseId    String   @map("warehouse_id") @db.Uuid
+  ownerClientId  String?  @map("owner_client_id") @db.Uuid
+  bomId          String   @map("bom_id") @db.Uuid
+  componentSkuId String   @map("component_sku_id") @db.Uuid
+  quantityPerKit Int      @map("quantity_per_kit")
+  scrapPercent   Decimal  @default(0) @map("scrap_percent") @db.Decimal(5, 2)
+  metadata       Json?
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  @@index([bomId])
+  @@index([componentSkuId])
+  @@map("kit_bom_lines")
+}
+
+model VasTask {
+  id                 String    @id @default(uuid()) @db.Uuid
+  warehouseId        String    @map("warehouse_id") @db.Uuid
+  ownerClientId      String?   @map("owner_client_id") @db.Uuid
+  serviceId          String?   @map("service_id") @db.Uuid
+  warehouseTaskId    String?   @map("warehouse_task_id") @db.Uuid
+  status             String    @default("OPEN")
+  targetResourceType String    @map("target_resource_type")
+  targetResourceId   String    @map("target_resource_id")
+  quantity           Int       @default(1)
+  instructions       String?
+  completedAt        DateTime? @map("completed_at")
+  metadata           Json?
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+
+  @@index([warehouseId, status, createdAt])
+  @@index([targetResourceType, targetResourceId])
+  @@map("vas_tasks")
+}
+
+model EnterpriseIntegrationInstance {
+  id              String   @id @default(uuid()) @db.Uuid
+  warehouseId     String   @map("warehouse_id") @db.Uuid
+  code            String
+  title           String
+  category        String
+  mode            String   @default("SANDBOX")
+  health          String   @default("MISSING_CREDENTIALS")
+  credentialRefs  Json?    @map("credential_refs")
+  supportedFlows  Json?    @map("supported_flows")
+  metadata        Json?
+  lastSyncAt      DateTime? @map("last_sync_at")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@unique([warehouseId, code])
+  @@index([warehouseId, category, mode])
+  @@map("enterprise_integration_instances")
+}
+
+model EnterpriseIntegrationEvent {
+  id              String   @id @default(uuid()) @db.Uuid
+  warehouseId     String   @map("warehouse_id") @db.Uuid
+  integrationId   String   @map("integration_id") @db.Uuid
+  flow            String
+  state           String
+  externalId      String   @map("external_id")
+  requestHash     String?  @map("request_hash")
+  payload         Json?
+  attempts        Int      @default(0)
+  lastError       String?  @map("last_error")
+  replayable      Boolean  @default(true)
+  receivedAt      DateTime @default(now()) @map("received_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@index([warehouseId, state, receivedAt])
+  @@index([integrationId, externalId])
+  @@map("enterprise_integration_events")
+}
+
+model EnterpriseEdiDocument {
+  id              String   @id @default(uuid()) @db.Uuid
+  warehouseId     String   @map("warehouse_id") @db.Uuid
+  partnerCode     String   @map("partner_code")
+  transactionSet  String   @map("transaction_set")
+  state           String
+  documentHash    String   @map("document_hash")
+  rawDocumentRef  String?  @map("raw_document_ref")
+  mappedEntities  Json?    @map("mapped_entities")
+  warnings        Json?
+  ackStatus       String   @default("PENDING") @map("ack_status")
+  replayable      Boolean  @default(true)
+  receivedAt      DateTime @default(now()) @map("received_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@index([warehouseId, partnerCode, transactionSet, state])
+  @@index([documentHash])
+  @@map("enterprise_edi_documents")
+}
+
+model EnterprisePrintStation {
+  id              String   @id @default(uuid()) @db.Uuid
+  warehouseId     String   @map("warehouse_id") @db.Uuid
+  code            String
+  mode            String
+  status          String   @default("OFFLINE")
+  assignedStations Json?   @map("assigned_stations")
+  defaultTemplate String?  @map("default_template")
+  heartbeatAt     DateTime? @map("heartbeat_at")
+  metadata        Json?
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@unique([warehouseId, code])
+  @@index([warehouseId, status])
+  @@map("enterprise_print_stations")
+}
+
+model EnterprisePrintJob {
+  id              String   @id @default(uuid()) @db.Uuid
+  warehouseId     String   @map("warehouse_id") @db.Uuid
+  stationCode     String   @map("station_code")
+  templateCode    String   @map("template_code")
+  state           String
+  attempts        Int      @default(0)
+  reference       String
+  payload         Json?
+  lastError       String?  @map("last_error")
+  reprintOf       String?  @map("reprint_of") @db.Uuid
+  queuedAt        DateTime @default(now()) @map("queued_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@index([warehouseId, state, queuedAt])
+  @@index([stationCode])
+  @@map("enterprise_print_jobs")
+}
+
+model EnterpriseRfDeviceSession {
+  id              String   @id @default(uuid()) @db.Uuid
+  warehouseId     String   @map("warehouse_id") @db.Uuid
+  deviceCode      String   @map("device_code")
+  workerCode      String   @map("worker_code")
+  state           String
+  currentFlow     String   @map("current_flow")
+  offlineQueue    Json?    @map("offline_queue")
+  startedAt       DateTime @default(now()) @map("started_at")
+  lastSeenAt      DateTime @default(now()) @map("last_seen_at")
+
+  @@index([warehouseId, deviceCode, state])
+  @@index([workerCode, state])
+  @@map("enterprise_rf_device_sessions")
+}
+
+model EnterpriseReturnWorkbenchCase {
+  id              String   @id @default(uuid()) @db.Uuid
+  warehouseId     String   @map("warehouse_id") @db.Uuid
+  rmaNumber       String   @map("rma_number")
+  state           String
+  grade           String
+  disposition     String
+  sku             String
+  quantity        Int
+  inspectionNotes String?  @map("inspection_notes")
+  photoRefs       Json?    @map("photo_refs")
+  financialImpact Decimal  @default(0) @map("financial_impact") @db.Decimal(12, 2)
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@unique([warehouseId, rmaNumber])
+  @@index([warehouseId, state, disposition])
+  @@map("enterprise_return_workbench_cases")
+}
+
+model EnterpriseWarehouseLayoutVersion {
+  id              String   @id @default(uuid()) @db.Uuid
+  warehouseId     String   @map("warehouse_id") @db.Uuid
+  version         Int
+  status          String   @default("DRAFT")
+  layout          Json
+  changeNote      String?  @map("change_note")
+  createdByUserId String?  @map("created_by_user_id") @db.Uuid
+  publishedAt     DateTime? @map("published_at")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@unique([warehouseId, version])
+  @@index([warehouseId, status])
+  @@map("enterprise_warehouse_layout_versions")
+}
+
+model EnterpriseSlottingRecommendation {
+  id              String   @id @default(uuid()) @db.Uuid
+  warehouseId     String   @map("warehouse_id") @db.Uuid
+  sku             String
+  currentLocation String   @map("current_location")
+  recommendedLocation String @map("recommended_location")
+  reason          String
+  priority        String
+  expectedTravelReductionPercent Int @map("expected_travel_reduction_percent")
+  state           String   @default("OPEN")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@index([warehouseId, priority, state])
+  @@map("enterprise_slotting_recommendations")
+}
+
+model EnterpriseLaborShiftSnapshot {
+  id              String   @id @default(uuid()) @db.Uuid
+  warehouseId     String   @map("warehouse_id") @db.Uuid
+  shiftCode       String   @map("shift_code")
+  snapshotAt      DateTime @default(now()) @map("snapshot_at")
+  kpis            Json
+  workerRows      Json     @map("worker_rows")
+  supervisorActions Json?  @map("supervisor_actions")
+
+  @@index([warehouseId, shiftCode, snapshotAt])
+  @@map("enterprise_labor_shift_snapshots")
+}
+
+model EnterpriseBillingExportBatch {
+  id              String   @id @default(uuid()) @db.Uuid
+  warehouseId     String   @map("warehouse_id") @db.Uuid
+  clientCode      String   @map("client_code")
+  profile         String
+  state           String
+  invoiceCount    Int      @map("invoice_count")
+  amount          Decimal  @db.Decimal(14, 2)
+  currency        String
+  warnings        Json?
+  approvedBy      String?  @map("approved_by")
+  exportedAt      DateTime? @map("exported_at")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@index([warehouseId, clientCode, state])
+  @@map("enterprise_billing_export_batches")
+}
+
+model EnterpriseCustomerPortalAccess {
+  id              String   @id @default(uuid()) @db.Uuid
+  clientId        String   @map("client_id") @db.Uuid
+  userId          String   @map("user_id") @db.Uuid
+  visibleWarehouses Json   @map("visible_warehouses")
+  reportPermissions Json   @map("report_permissions")
+  status          String   @default("ACTIVE")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@unique([clientId, userId])
+  @@index([userId, status])
+  @@map("enterprise_customer_portal_access")
+}
