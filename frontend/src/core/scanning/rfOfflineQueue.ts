@@ -16,37 +16,99 @@ export interface StoredRfOfflineScan {
   metadata: Record<string, unknown>;
 }
 
+// Persist each user-acknowledged scan before indicating success in the scanner UI.
+// A serialized per-warehouse queue prevents concurrent writes from clobbering each other.
+const warehouseOperations = new Map<string, Promise<void>>();
+
+function serializeWarehouse<T>(warehouseId: string, work: () => Promise<T>): Promise<T> {
+  const previous = warehouseOperations.get(warehouseId) ?? Promise.resolve();
+  const operation = previous.then(work, work);
+  warehouseOperations.set(warehouseId, operation.then(() => undefined, () => undefined));
+  return operation;
+}
+
 export async function loadRfOfflineQueue(warehouseId: string): Promise<StoredRfOfflineScan[]> {
   const normalizedWarehouse = normalizeWarehouse(warehouseId);
-
+  // Read the fallback first. IndexedDB might recover after the fallback received
+  // newer unacknowledged scans; never erase those scans merely because IDB opens.
+  const fallback = loadFallbackQueue(normalizedWarehouse);
   try {
     const database = await openDatabase();
-    await migrateLegacyQueue(database, normalizedWarehouse);
-    const scans = await readAll(database);
-    database.close();
-    return sortAndLimit(scans.filter((scan) => scan.warehouseId === normalizedWarehouse));
-  } catch {
-    return loadFallbackQueue(normalizedWarehouse);
+    try {
+      await migrateLegacyQueue(database, normalizedWarehouse);
+      const scans = (await readAll(database)).filter((scan) => scan.warehouseId === normalizedWarehouse);
+      const merged = mergeScans(scans, fallback ?? []);
+      if (fallback !== null) {
+        await replaceWarehouseQueue(database, normalizedWarehouse, merged);
+        removeFallbackQueue(normalizedWarehouse);
+      }
+      return merged;
+    } finally {
+      database.close();
+    }
+  } catch (error) {
+    // Do not silently create an empty queue when an existing IDB queue might
+    // only be temporarily inaccessible.
+    if (fallback !== null) return fallback;
+    throw error;
   }
 }
 
-export async function saveRfOfflineQueue(
-  warehouseId: string,
-  scans: StoredRfOfflineScan[],
-): Promise<void> {
+export function saveRfOfflineQueue(warehouseId: string, scans: StoredRfOfflineScan[]): Promise<void> {
   const normalizedWarehouse = normalizeWarehouse(warehouseId);
-  const normalizedScans = sortAndLimit(
-    scans.map((scan) => ({ ...scan, warehouseId: normalizedWarehouse })),
-  );
+  return serializeWarehouse(normalizedWarehouse, async () => {
+    await persistWarehouseQueue(normalizedWarehouse, mergeScans(
+      scans.map((scan) => ({ ...scan, warehouseId: normalizedWarehouse })),
+    ));
+  });
+}
 
+export function appendRfOfflineScan(
+  warehouseId: string,
+  scan: StoredRfOfflineScan,
+): Promise<StoredRfOfflineScan[]> {
+  const normalizedWarehouse = normalizeWarehouse(warehouseId);
+  return serializeWarehouse(normalizedWarehouse, async () => {
+    const stored = await loadRfOfflineQueue(normalizedWarehouse);
+    const next = mergeScans(stored, [{ ...scan, warehouseId: normalizedWarehouse }]);
+    await persistWarehouseQueue(normalizedWarehouse, next);
+    return next;
+  });
+}
+
+export function removeRfOfflineScans(
+  warehouseId: string,
+  confirmedIdempotencyKeys: string[],
+): Promise<StoredRfOfflineScan[]> {
+  const normalizedWarehouse = normalizeWarehouse(warehouseId);
+  return serializeWarehouse(normalizedWarehouse, async () => {
+    const stored = await loadRfOfflineQueue(normalizedWarehouse);
+    const confirmed = new Set(confirmedIdempotencyKeys);
+    const next = stored.filter((scan) => !confirmed.has(scan.idempotencyKey));
+    await persistWarehouseQueue(normalizedWarehouse, next);
+    return next;
+  });
+}
+
+async function persistWarehouseQueue(warehouseId: string, scans: StoredRfOfflineScan[]): Promise<void> {
+  let database: IDBDatabase | null = null;
   try {
-    const database = await openDatabase();
-    await replaceWarehouseQueue(database, normalizedWarehouse, normalizedScans);
-    database.close();
-    removeFallbackQueue(normalizedWarehouse);
+    database = await openDatabase();
+    await replaceWarehouseQueue(database, warehouseId, scans);
+    removeFallbackQueue(warehouseId);
   } catch {
-    saveFallbackQueue(normalizedWarehouse, normalizedScans);
+    // If IndexedDB failed, fallback storage must also acknowledge its write.
+    // Quota/permission errors must reach the UI, never be reported as saved.
+    saveFallbackQueue(warehouseId, scans);
+  } finally {
+    database?.close();
   }
+}
+
+function mergeScans(...groups: StoredRfOfflineScan[][]): StoredRfOfflineScan[] {
+  const merged = new Map<string, StoredRfOfflineScan>();
+  for (const group of groups) for (const scan of group) merged.set(scan.idempotencyKey, scan);
+  return sortAndLimit([...merged.values()]);
 }
 
 function openDatabase(): Promise<IDBDatabase> {
@@ -73,7 +135,14 @@ function openDatabase(): Promise<IDBDatabase> {
 function readAll(database: IDBDatabase): Promise<StoredRfOfflineScan[]> {
   return new Promise((resolve, reject) => {
     const request = database.transaction(STORE_NAME, 'readonly').objectStore(STORE_NAME).getAll();
-    request.onsuccess = () => resolve(normalizeScans(request.result));
+    request.onsuccess = () => {
+      const normalized = normalizeScans(request.result);
+      if (normalized.length !== request.result.length) {
+        reject(new Error('RF_OFFLINE_DATABASE_CORRUPT'));
+        return;
+      }
+      resolve(normalized);
+    };
     request.onerror = () => reject(request.error ?? new Error('Offline queue could not be read'));
   });
 }
@@ -132,23 +201,24 @@ async function migrateLegacyQueue(database: IDBDatabase, warehouseId: string): P
   }
 }
 
-function loadFallbackQueue(warehouseId: string): StoredRfOfflineScan[] {
-  if (typeof window === 'undefined') return [];
+function loadFallbackQueue(warehouseId: string): StoredRfOfflineScan[] | null {
+  if (typeof window === 'undefined') return null;
   try {
-    const parsed = JSON.parse(window.localStorage.getItem(fallbackKey(warehouseId)) ?? '[]');
-    return sortAndLimit(normalizeScans(parsed).map((scan) => ({ ...scan, warehouseId })));
+    const raw = window.localStorage.getItem(fallbackKey(warehouseId));
+    if (raw === null) return null;
+    const parsed: unknown = JSON.parse(raw);
+    if (!Array.isArray(parsed)) throw new Error('RF_OFFLINE_FALLBACK_CORRUPT');
+    const normalized = normalizeScans(parsed).map((scan) => ({ ...scan, warehouseId }));
+    if (normalized.length !== parsed.length) throw new Error('RF_OFFLINE_FALLBACK_CORRUPT');
+    return sortAndLimit(normalized);
   } catch {
-    return [];
+    throw new Error('RF_OFFLINE_FALLBACK_UNREADABLE');
   }
 }
 
 function saveFallbackQueue(warehouseId: string, scans: StoredRfOfflineScan[]): void {
-  if (typeof window === 'undefined') return;
-  try {
-    window.localStorage.setItem(fallbackKey(warehouseId), JSON.stringify(scans));
-  } catch {
-    // The active UI still keeps the queue in memory and will expose sync failure.
-  }
+  if (typeof window === 'undefined') throw new Error('RF_OFFLINE_STORAGE_UNAVAILABLE');
+  window.localStorage.setItem(fallbackKey(warehouseId), JSON.stringify(scans));
 }
 
 function removeFallbackQueue(warehouseId: string): void {
@@ -156,7 +226,7 @@ function removeFallbackQueue(warehouseId: string): void {
   try {
     window.localStorage.removeItem(fallbackKey(warehouseId));
   } catch {
-    // Best effort cleanup only.
+    // Primary is already durably written; retry removal at a later launch.
   }
 }
 
@@ -186,9 +256,8 @@ function normalizeScans(value: unknown): StoredRfOfflineScan[] {
 }
 
 function sortAndLimit(scans: StoredRfOfflineScan[]): StoredRfOfflineScan[] {
-  return [...scans]
-    .sort((left, right) => Date.parse(right.recordedAt) - Date.parse(left.recordedAt))
-    .slice(0, 500);
+  // Never discard an unacknowledged operation. Storage failure is explicit.
+  return [...scans].sort((left, right) => Date.parse(right.recordedAt) - Date.parse(left.recordedAt));
 }
 
 function normalizeWarehouse(value: string): string {

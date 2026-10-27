@@ -670,8 +670,8 @@ export class LabelsService {
     await this.ensureHardwareTables();
     const warehouse = await this.resolveWarehouse(warehouseReference);
     const job = await this.resolveRuntimePrintJobRow(warehouse.id, jobId);
-    if (job.status === 'PRINTED') {
-      throw new ConflictException('Printed jobs cannot be reassigned; use reprint instead');
+    if (job.status === 'PRINTED' || job.status === 'PRINTING' || job.status === 'CLAIMED') {
+      throw new ConflictException('An already claimed, printing or printed job must be reconciled before reassignment');
     }
 
     const printerCode = normalizeNullableString(dto.printerCode);
@@ -694,13 +694,17 @@ export class LabelsService {
            printed_at = NULL,
            updated_at = now()
        WHERE id = $1::uuid AND warehouse_id = $2::uuid
+         AND status NOT IN ('CLAIMED', 'PRINTING', 'PRINTED')
        RETURNING *`,
       job.id,
       warehouse.id,
       printerCode ?? '',
       agentCode ?? '',
     );
-    const updated = required(rows, 'Print job reassignment was not stored');
+    if (!rows[0]) {
+      throw new ConflictException('Print job changed state while being reassigned');
+    }
+    const updated = rows[0];
     await this.writeRuntimeAudit(actor, warehouse.id, 'runtime_print_job.reassigned', 'runtime_print_job', updated.id, {
       fromPrinterCode: job.printer_code,
       toPrinterCode: updated.printer_code,

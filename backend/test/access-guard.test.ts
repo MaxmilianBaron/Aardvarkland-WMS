@@ -168,3 +168,39 @@ function admin(): AuthenticatedUser {
     clientAccess: [],
   };
 }
+
+test('query string cannot spoof MFA recovery on an ordinary operation', () => {
+  const guard = createAccessGuard(undefined, ['user.manage'], 'block');
+  const context = createHttpContext({
+    user: admin(),
+    auth: { mfaRequired: true, mfaSatisfied: false, mfaEnrollmentRequired: true },
+    method: 'POST',
+    originalUrl: '/api/users?redirect=/api/auth/me/mfa/setup',
+    headers: {},
+  });
+  assert.throws(() => guard.canActivate(context), ForbiddenException);
+});
+
+test('privileged MFA is enforced even when a handler has no explicit permission decorator', () => {
+  const guard = createAccessGuard(undefined, undefined, 'block');
+  const context = createHttpContext({
+    user: admin(),
+    auth: { mfaRequired: true, mfaSatisfied: false, mfaEnrollmentRequired: true },
+    method: 'POST',
+    originalUrl: '/api/users',
+    headers: {},
+  });
+  assert.throws(() => guard.canActivate(context), ForbiddenException);
+});
+
+test('real MFA enrollment path remains available to an unenrolled privileged session', () => {
+  const guard = createAccessGuard(undefined, undefined, 'block');
+  const context = createHttpContext({
+    user: admin(),
+    auth: { mfaRequired: true, mfaSatisfied: false, mfaEnrollmentRequired: true },
+    method: 'POST',
+    originalUrl: '/api/auth/me/mfa/setup',
+    headers: {},
+  });
+  assert.equal(guard.canActivate(context), true);
+});

@@ -73,16 +73,27 @@ async function processJob(job) {
     return;
   }
 
+  let physicallySent = false;
   try {
     await report(job.id, 'PRINTING', '');
     for (let copy = 0; copy < Math.max(1, Number(job.copies ?? 1)); copy += 1) {
       await printZpl(printer, String(job.renderedZpl ?? ''));
+      physicallySent = true; // A later copy might fail after this one was sent.
     }
     await report(job.id, 'PRINTED', '');
     console.log(`[print-agent] printed ${job.id} on ${printerCode}`);
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    await report(job.id, 'FAILED', message);
+    if (physicallySent) {
+      // The physical outcome is not reversible. PRINTING must be reconciled
+      // by an operator instead of being relabeled FAILED and retried blindly.
+      console.error(`[print-agent] print ${job.id} sent, acknowledgement uncertain: ${message}`);
+      return;
+    }
+    try { await report(job.id, 'FAILED', message); }
+    catch (reportError) {
+      console.error('[print-agent] could not report failure', reportError);
+    }
     console.error(`[print-agent] failed ${job.id}: ${message}`);
   }
 }
@@ -146,15 +157,16 @@ function printWindowsRaw(printer, zpl) {
       zplBase64,
     ], { windowsHide: true });
     let stderr = '';
+    let timedOut = false;
+    const timeout = setTimeout(() => { timedOut = true; child.kill(); }, 30_000);
     child.stderr.on('data', (chunk) => {
-      stderr += chunk.toString();
+      stderr = (stderr + chunk.toString()).slice(-4000);
     });
-    child.on('error', reject);
+    child.on('error', (error) => { clearTimeout(timeout); reject(error); });
     child.on('exit', (code) => {
-      if (code === 0) {
-        resolve();
-        return;
-      }
+      clearTimeout(timeout);
+      if (timedOut) { reject(new Error('Windows RAW helper timed out')); return; }
+      if (code === 0) { resolve(); return; }
       reject(new Error(stderr.trim() || `Windows RAW helper exited with code ${code}`));
     });
   });
@@ -174,6 +186,7 @@ async function apiPost(path, body) {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify(body),
+    signal: AbortSignal.timeout(15_000),
   });
   const payload = await response.json().catch(() => ({}));
   if (!response.ok) {

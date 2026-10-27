@@ -15,7 +15,8 @@ import { getRfQueue, listScanners, reportRfTaskException, resolveScan, scanRfSes
 import { config } from '../../app/config';
 import {
   loadRfOfflineQueue,
-  saveRfOfflineQueue,
+  appendRfOfflineScan,
+  removeRfOfflineScans,
   type StoredRfOfflineScan,
 } from '../../core/scanning/rfOfflineQueue';
 import { cx } from '../../core/utils/format';
@@ -328,6 +329,7 @@ export function RfPage() {
   const [scannerDeviceReference, setScannerDeviceReference] = useState(() => readScannerReference(warehouseId));
   const [pending, setPending] = useState<PendingOfflineScan[]>([]);
   const [queueLoadedWarehouse, setQueueLoadedWarehouse] = useState<string | null>(null);
+  const [offlineQueueError, setOfflineQueueError] = useState(false);
   const [log, setLog] = useState<string[]>([]);
   const tasksQueue = queueResource.data.tasks;
   const selectedTask = tasksQueue.find((task) => task.id === selectedTaskId) ?? tasksQueue[0];
@@ -345,20 +347,18 @@ export function RfPage() {
   useEffect(() => {
     let active = true;
     setQueueLoadedWarehouse(null);
+    setOfflineQueueError(false);
+    setPending([]);
     loadRfOfflineQueue(warehouseId).then((scans) => {
       if (!active) return;
       setPending(scans);
       setQueueLoadedWarehouse(warehouseId);
+    }).catch(() => {
+      if (!active) return;
+      setOfflineQueueError(true);
     });
-    return () => {
-      active = false;
-    };
+    return () => { active = false; };
   }, [warehouseId]);
-
-  useEffect(() => {
-    if (queueLoadedWarehouse !== warehouseId) return;
-    void saveRfOfflineQueue(warehouseId, pending);
-  }, [pending, queueLoadedWarehouse, warehouseId]);
 
   useEffect(() => {
     setScannerDeviceReference(readScannerReference(warehouseId));
@@ -448,10 +448,20 @@ export function RfPage() {
         recordedAt: new Date().toISOString(),
         metadata: { expected, matched, role: roleProfile.id, offlineUi: true },
       };
-      setPending((items) => [queued, ...items].slice(0, 500));
-      appendLog(`${current.label}: ${text.log.offlineSaved} · ${value}`);
-      if (matched) setStepIndex((index) => Math.min(index + 1, expectedSteps.length - 1));
-      setScanValue('');
+      if (queueLoadedWarehouse !== warehouseId || offlineQueueError) {
+        appendLog(`${text.error}: ${text.offlineQueue}`);
+        return;
+      }
+      try {
+        const saved = await appendRfOfflineScan(warehouseId, queued);
+        setPending(saved);
+        appendLog(`${current.label}: ${text.log.offlineSaved} · ${value}`);
+        if (matched) setStepIndex((index) => Math.min(index + 1, expectedSteps.length - 1));
+        setScanValue('');
+      } catch {
+        setOfflineQueueError(true);
+        appendLog(`${text.error}: ${text.offlineQueue}`);
+      }
       return;
     }
 
@@ -477,8 +487,16 @@ export function RfPage() {
       metadata: { source: 'rf-ui', scannerDeviceReference },
     }));
     if (!result) return;
-    const keep = new Set(result.items.filter((item) => item.status === 'FAILED' || item.status === 'QUEUED').map((item) => item.idempotencyKey));
-    setPending((items) => items.filter((item) => keep.has(item.idempotencyKey)));
+    const confirmed = result.items.filter((item) => item.status === 'SYNCED' || item.status === 'DUPLICATE').map((item) => item.idempotencyKey);
+    try {
+      // Remove only server-acknowledged keys from the *current persisted* queue,
+      // not a stale React snapshot; concurrently queued scans must survive.
+      setPending(await removeRfOfflineScans(warehouseId, confirmed));
+    } catch {
+      setOfflineQueueError(true);
+      appendLog(`${text.error}: ${text.offlineQueue}`);
+      return;
+    }
     appendLog(`${text.log.sync}: ${result.synced} ${text.log.synced} · ${result.failed} ${text.log.failed} · ${result.duplicates} ${text.log.duplicates}`);
     queueResource.refresh();
   };
@@ -521,11 +539,12 @@ export function RfPage() {
             <Button size="sm" type="button" tone={rfDisplayMode === 'MOBILE' ? 'primary' : 'secondary'} onClick={() => { void setRfDisplayMode('MOBILE'); }} disabled={workContextStatus === 'loading'}>{text.rfModes.MOBILE}</Button>
             <Button size="sm" type="button" tone={rfDisplayMode === 'TERMINAL' ? 'primary' : 'secondary'} onClick={() => { void setRfDisplayMode('TERMINAL'); }} disabled={workContextStatus === 'loading'}>{text.rfModes.TERMINAL}</Button>
           </div>
-          <Button data-e2e-action="rf-toggle-offline" onClick={() => setOffline((value) => !value)} tone={offline ? 'primary' : 'secondary'}>{offline ? text.offlineOn : text.goOffline}</Button>
-          <Button data-e2e-action="rf-sync-offline" onClick={syncPending} disabled={!pending.length || mutation.status === 'running'}>{text.sendQueue} ({pending.length})</Button>
+          <Button data-e2e-action="rf-toggle-offline" disabled={offlineQueueError || queueLoadedWarehouse !== warehouseId} onClick={() => setOffline((value) => !value)} tone={offline ? 'primary' : 'secondary'}>{offline ? text.offlineOn : text.goOffline}</Button>
+          <Button data-e2e-action="rf-sync-offline" onClick={syncPending} disabled={offlineQueueError || !pending.length || mutation.status === 'running'}>{text.sendQueue} ({pending.length})</Button>
         </div>
       </section>
 
+      {offlineQueueError && <p role="alert">${text.error}: ${text.offlineQueue}</p>}
       <Card title={text.scanner} eyebrow={selectedTask ? `${selectedTask.id} · ${rfWorkflowLabel(selectedTask.workflow, language)}` : text.noTask} className="span-7 scanner-card">
         <div className={cx('scanner-terminal', offline && 'is-offline', rfDisplayMode !== 'DESKTOP' && 'is-mobile-mode')}>
           <div className="scanner-terminal__top">

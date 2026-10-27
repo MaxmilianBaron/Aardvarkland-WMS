@@ -123,6 +123,34 @@ export async function pingHttpIntegrationEndpoint(
   return { ...response, url, method };
 }
 
+// Stop reading at the limit, rather than truncating only after allocating the body.
+async function readBoundedIntegrationResponse(response: Response): Promise<string> {
+  const maxBytes = 64 * 1024;
+  if (!response.body) {
+    const text = await response.text();
+    if (Buffer.byteLength(text, 'utf8') > maxBytes) throw new Error('Integration response exceeds size limit');
+    return text;
+  }
+  const reader = response.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let length = 0;
+  try {
+    for (;;) {
+      const part = await reader.read();
+      if (part.done) break;
+      length += part.value.byteLength;
+      if (length > maxBytes) {
+        await reader.cancel();
+        throw new Error('Integration response exceeds size limit');
+      }
+      chunks.push(part.value);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+  return Buffer.concat(chunks.map((part) => Buffer.from(part))).toString('utf8');
+}
+
 async function callIntegrationEndpoint(input: {
   endpoint: HttpIntegrationEndpoint;
   config: IntegrationEndpointConfig;
@@ -146,8 +174,9 @@ async function callIntegrationEndpoint(input: {
       headers,
       body: input.body,
       signal: controller.signal,
+      redirect: 'error',
     });
-    const text = await response.text();
+    const text = await readBoundedIntegrationResponse(response);
     const result = {
       statusCode: response.status,
       success: response.ok,

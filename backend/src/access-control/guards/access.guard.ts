@@ -33,18 +33,18 @@ export class AccessGuard implements CanActivate {
       [context.getHandler(), context.getClass()],
     );
 
+    const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
+    const user = request.user;
+    // Privileged MFA is a session-level requirement, not only a permission decorator.
+    if (user) this.assertPrivilegedMfa(user, request);
+
     if (!requiredPermissions?.length && !requiredWarehousePermissions?.length) {
       return true;
     }
 
-    const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
-    const user = request.user;
-
     if (!user) {
       throw new ForbiddenException('Authenticated user context is missing');
     }
-
-    this.assertPrivilegedMfa(user, request);
 
     if (requiredPermissions?.length && !hasAllPermissions(user.permissions, requiredPermissions)) {
       throw new ForbiddenException('Missing required permission');
@@ -127,17 +127,18 @@ export class AccessGuard implements CanActivate {
 
 function isMfaRecoveryPath(request: AuthenticatedRequest): boolean {
   const method = request.method?.toUpperCase() ?? 'GET';
-  const url = request.originalUrl ?? request.url ?? request.path ?? '';
-  if (method === 'GET' && (url.endsWith('/api/auth/me') || url.endsWith('/auth/me'))) {
-    return true;
+  // Strip query strings; never classify an arbitrary operation by URL substring.
+  const path = ((request.path ?? request.originalUrl ?? request.url ?? '').split('?')[0] ?? '').replace(/\/+$/, '');
+  const route = path.startsWith('/api/') ? path.slice(4) : path;
+  if (method === 'GET') {
+    return route === '/auth/me' || route === '/auth/me/mfa';
   }
-
-  return (
-    url.includes('/api/auth/me/mfa') ||
-    url.includes('/auth/me/mfa') ||
-    url.includes('/api/auth/logout') ||
-    url.includes('/auth/logout')
-  );
+  if (method === 'POST') {
+    return route === '/auth/me/mfa/setup'
+      || route === '/auth/me/mfa/verify'
+      || route === '/auth/revoke';
+  }
+  return false;
 }
 
 function hasAllPermissions(availablePermissions: string[], requiredPermissions: string[]): boolean {

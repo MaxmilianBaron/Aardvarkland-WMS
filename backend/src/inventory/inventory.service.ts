@@ -1,3 +1,5 @@
+import { createHash } from 'node:crypto';
+
 import {
   ConflictException,
   Injectable,
@@ -132,13 +134,59 @@ export class InventoryService {
       ...(query.expiringBefore ? { expiryDate: { lte: new Date(query.expiringBefore) } } : {}),
       ...(query.includeZero ? {} : { quantity: { gt: 0 } }),
     };
+    // Aggregate the *entire* authorized selection before paginating groups.
+    // Paginating quants first can return a partial balance at a page boundary.
+    if ('groupBy' in client.stockQuant) {
+      const groupedClient = client.stockQuant as unknown as {
+        groupBy(args: Record<string, unknown>): Promise<Array<{
+          warehouseId: string; skuId: string; locationId: string;
+          status: StockQuantStatus; ownerClientId: string | null;
+          lotId: string | null; batch: string | null; expiryDate: Date | null;
+          _sum: { quantity: number | null; reservedQuantity: number | null };
+          _count: { _all: number };
+        }>>;
+      };
+      const grouped = await groupedClient.groupBy({
+        by: ['warehouseId', 'skuId', 'locationId', 'status', 'ownerClientId', 'lotId', 'batch', 'expiryDate'],
+        where,
+        _sum: { quantity: true, reservedQuantity: true },
+        _count: { _all: true },
+        orderBy: [
+          { skuId: 'asc' }, { locationId: 'asc' }, { status: 'asc' },
+          { ownerClientId: 'asc' }, { lotId: 'asc' }, { batch: 'asc' }, { expiryDate: 'asc' },
+        ],
+        take: page.take,
+        skip: page.skip,
+      });
+      const balances: StockBalanceRecord[] = grouped.map((group) => {
+        const quantity = group._sum.quantity ?? 0;
+        const reservedQuantity = group._sum.reservedQuantity ?? 0;
+        return {
+          warehouseId: group.warehouseId,
+          skuId: group.skuId,
+          locationId: group.locationId,
+          status: group.status,
+          ownerClientId: group.ownerClientId,
+          lotId: group.lotId,
+          batch: group.batch,
+          expiry: group.expiryDate,
+          quantity,
+          reservedQuantity,
+          availableQuantity: group.status === StockQuantStatus.AVAILABLE
+            ? Math.max(quantity - reservedQuantity, 0) : 0,
+          quantCount: group._count._all,
+        };
+      });
+      return this.toBalanceResponses(client, balances);
+    }
+
+    // Compatibility path for older isolated test doubles without groupBy.
     const quants = await client.stockQuant.findMany({
       where,
       orderBy: [{ skuId: 'asc' }, { locationId: 'asc' }, { updatedAt: 'desc' }],
       take: page.take,
       skip: page.skip,
     });
-
     return this.toBalanceResponses(client, groupStockBalances(quants));
   }
 
@@ -323,10 +371,12 @@ export class InventoryService {
       ...(query.type ? { type: query.type } : {}),
       ...(sku ? { skuId: sku.id } : {}),
       ...ownerQuantFilter,
-      ...(location ? { OR: [{ fromLocationId: location.id }, { toLocationId: location.id }] } : {}),
-      ...(reference === undefined
-        ? {}
-        : { OR: [{ referenceType: reference }, { referenceId: reference }] }),
+      ...((location || reference !== undefined) ? {
+        AND: [
+          ...(location ? [{ OR: [{ fromLocationId: location.id }, { toLocationId: location.id }] }] : []),
+          ...(reference !== undefined ? [{ OR: [{ referenceType: reference }, { referenceId: reference }] }] : []),
+        ],
+      } : {}),
       ...(idempotencyKey === undefined ? {} : { idempotencyKey }),
       ...(occurredAt ? { occurredAt } : {}),
     };
@@ -359,11 +409,18 @@ export class InventoryService {
   ): Promise<StockOperationResponse> {
     const client = this.getClient();
     const warehouse = await this.resolveWarehouse(client, warehouseReference);
+    const requestFingerprint = stockRequestFingerprint({
+      warehouseId: warehouse.id,
+      type: StockMovementType.RECEIVE,
+      actorId: actor.id,
+      dto,
+    });
     const existingOperation = await this.findIdempotentOperation(
       client,
       warehouse.id,
       StockMovementType.RECEIVE,
       dto.idempotencyKey,
+      requestFingerprint,
     );
 
     if (existingOperation) {
@@ -413,6 +470,7 @@ export class InventoryService {
         actorUserId: actor.id,
         reference: normalizeNullableString(dto.reference),
         idempotencyKey: normalizeNullableString(dto.idempotencyKey),
+        requestFingerprint,
         metadata: toJsonInput(dto.metadata),
       });
 
@@ -446,11 +504,18 @@ export class InventoryService {
   ): Promise<StockOperationResponse> {
     const client = this.getClient();
     const warehouse = await this.resolveWarehouse(client, warehouseReference);
+    const requestFingerprint = stockRequestFingerprint({
+      warehouseId: warehouse.id,
+      type: StockMovementType.MOVE,
+      actorId: actor.id,
+      dto,
+    });
     const existingOperation = await this.findIdempotentOperation(
       client,
       warehouse.id,
       StockMovementType.MOVE,
       dto.idempotencyKey,
+      requestFingerprint,
     );
 
     if (existingOperation) {
@@ -498,6 +563,7 @@ export class InventoryService {
         actorUserId: actor.id,
         reference: normalizeNullableString(dto.reference),
         idempotencyKey: normalizeNullableString(dto.idempotencyKey),
+        requestFingerprint,
         metadata: toJsonInput(
           withStockAdjustmentReasonMetadata(dto.metadata, dto.reasonCode, dto.reason),
         ),
@@ -542,11 +608,18 @@ export class InventoryService {
   ): Promise<StockOperationResponse> {
     const client = this.getClient();
     const warehouse = await this.resolveWarehouse(client, warehouseReference);
+    const requestFingerprint = stockRequestFingerprint({
+      warehouseId: warehouse.id,
+      type: StockMovementType.ADJUST,
+      actorId: actor.id,
+      dto,
+    });
     const existingOperation = await this.findIdempotentOperation(
       client,
       warehouse.id,
       StockMovementType.ADJUST,
       dto.idempotencyKey,
+      requestFingerprint,
     );
 
     if (existingOperation) {
@@ -606,6 +679,7 @@ export class InventoryService {
         actorUserId: actor.id,
         reference: normalizeNullableString(dto.reference),
         idempotencyKey: normalizeNullableString(dto.idempotencyKey),
+        requestFingerprint,
         metadata: toJsonInput(
           withStockAdjustmentReasonMetadata(dto.metadata, dto.reasonCode, dto.reason),
         ),
@@ -651,11 +725,19 @@ export class InventoryService {
   ): Promise<StockOperationResponse> {
     const client = this.getClient();
     const warehouse = await this.resolveWarehouse(client, warehouseReference);
+    const requestFingerprint = stockRequestFingerprint({
+      warehouseId: warehouse.id,
+      type: StockMovementType.BLOCK,
+      actorId: actor.id,
+      dto,
+      quantReference,
+    });
     const existingOperation = await this.findIdempotentOperation(
       client,
       warehouse.id,
       StockMovementType.BLOCK,
       dto.idempotencyKey,
+      requestFingerprint,
     );
 
     if (existingOperation) {
@@ -679,6 +761,7 @@ export class InventoryService {
         actor,
         reference: dto.reference,
         idempotencyKey: dto.idempotencyKey,
+        requestFingerprint,
         metadata: withReasonMetadata(dto.metadata, dto.reason),
       }),
     );
@@ -694,11 +777,19 @@ export class InventoryService {
   ): Promise<StockOperationResponse> {
     const client = this.getClient();
     const warehouse = await this.resolveWarehouse(client, warehouseReference);
+    const requestFingerprint = stockRequestFingerprint({
+      warehouseId: warehouse.id,
+      type: StockMovementType.UNBLOCK,
+      actorId: actor.id,
+      dto,
+      quantReference,
+    });
     const existingOperation = await this.findIdempotentOperation(
       client,
       warehouse.id,
       StockMovementType.UNBLOCK,
       dto.idempotencyKey,
+      requestFingerprint,
     );
 
     if (existingOperation) {
@@ -727,6 +818,7 @@ export class InventoryService {
         actor,
         reference: dto.reference,
         idempotencyKey: dto.idempotencyKey,
+        requestFingerprint,
         metadata: withReasonMetadata(dto.metadata, dto.reason),
       }),
     );
@@ -949,6 +1041,7 @@ export class InventoryService {
     warehouseId: string,
     type: StockMovementType,
     rawIdempotencyKey: string | undefined,
+    requestFingerprint: string,
   ): Promise<StockOperationResponse | null> {
     const idempotencyKey = normalizeOptionalString(rawIdempotencyKey);
 
@@ -966,9 +1059,16 @@ export class InventoryService {
     }
 
     if (movement.type !== type) {
-      throw new ConflictException(
-        'Idempotency key has already been used for another movement type',
-      );
+      throw new ConflictException('Idempotency key has already been used for another movement type');
+    }
+    const storedFingerprint = movement.metadata && typeof movement.metadata === 'object'
+      && !Array.isArray(movement.metadata)
+      ? (movement.metadata as Record<string, unknown>)['requestFingerprint']
+      : undefined;
+    if (storedFingerprint !== requestFingerprint) {
+      // Legacy records have no hash; replaying them without knowing the original
+      // request would be an unsafe false positive.
+      throw new ConflictException('Idempotency key was reused with different or unverifiable request content');
     }
 
     if (!movement.stockQuantId) {
@@ -1089,6 +1189,7 @@ export class InventoryService {
       actorUserId: input.actor.id,
       reference: normalizeNullableString(input.reference),
       idempotencyKey: normalizeNullableString(input.idempotencyKey),
+      requestFingerprint: input.requestFingerprint,
       metadata: toJsonInput(input.metadata),
     });
 
@@ -1193,7 +1294,10 @@ export class InventoryService {
       referenceId: input.reference,
       sourceSystem: input.idempotencyKey ? 'WMS' : null,
       idempotencyKey: input.idempotencyKey,
-      metadata: withMovementDeltaMetadata(input.metadata, input.quantityDelta),
+      metadata: withMovementDeltaMetadata(
+        withOperationFingerprint(input.metadata, input.requestFingerprint),
+        input.quantityDelta,
+      ),
       occurredAt: new Date(),
     };
     const attempts = [
@@ -1633,6 +1737,35 @@ function withReasonMetadata(
   };
 }
 
+export function stockRequestFingerprint(value: unknown): string {
+  const canonical = (input: unknown): unknown => {
+    if (input === null || typeof input !== 'object') return input;
+    if (input instanceof Date) return input.toISOString();
+    if (Array.isArray(input)) return input.map(canonical);
+    return Object.fromEntries(
+      Object.entries(input as Record<string, unknown>)
+        .filter(([, entry]) => entry !== undefined)
+        .sort(([left], [right]) => left.localeCompare(right))
+        .map(([key, entry]) => [key, canonical(entry)]),
+    );
+  };
+  return createHash('sha256').update(JSON.stringify(canonical(value))).digest('hex');
+}
+
+function withOperationFingerprint(
+  metadata: Prisma.InputJsonValue | undefined,
+  requestFingerprint: string | undefined,
+): Prisma.InputJsonValue | undefined {
+  if (!requestFingerprint) return metadata;
+  if (!metadata || typeof metadata !== 'object' || Array.isArray(metadata)) {
+    return { requestFingerprint };
+  }
+  return {
+    ...(metadata as Record<string, unknown>),
+    requestFingerprint,
+  } as Prisma.InputJsonValue;
+}
+
 function withMovementDeltaMetadata(
   metadata: Prisma.InputJsonValue | undefined,
   quantityDelta: number | undefined,
@@ -1801,6 +1934,7 @@ interface CreateStockMovementInput {
   actorUserId: string | null;
   reference: string | null;
   idempotencyKey: string | null;
+  requestFingerprint?: string;
   metadata?: Prisma.InputJsonValue;
 }
 
@@ -1813,6 +1947,7 @@ interface TransferQuantStatusInput {
   actor: AuthenticatedUser;
   reference: string | undefined;
   idempotencyKey: string | undefined;
+  requestFingerprint?: string;
   metadata: Record<string, unknown> | undefined;
 }
 

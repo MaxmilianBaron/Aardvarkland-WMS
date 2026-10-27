@@ -6,6 +6,7 @@ import test from 'node:test';
 
 import { lockPostgresRowById } from '../src/database';
 import { findInventoryInvariantViolations } from '../src/inventory/inventory-invariants.helpers';
+import { stockRequestFingerprint } from '../src/inventory/inventory.service';
 
 const reservationSource = () =>
   readFileSync(join(cwd(), 'src', 'reservations', 'reservations.service.ts'), 'utf8');
@@ -141,4 +142,12 @@ test('inventory idempotency has a database uniqueness backstop inside the transa
   assert.match(service, /sourceSystem:\s*input\.idempotencyKey \? 'WMS' : null/);
   assert.match(receive, /const result = await this\.transaction\(client, async \(tx\) =>/);
   assert.match(receive, /await this\.createStockMovement\(tx,/);
+});
+
+test('stock idempotency fingerprints are canonical and include business payload', () => {
+  const first = stockRequestFingerprint({ warehouseId: 'WH', type: 'RECEIVE', actorId: 'A', dto: { quantity: 1, skuReference: 'P', metadata: { b: 2, a: 1 } } });
+  const reordered = stockRequestFingerprint({ dto: { metadata: { a: 1, b: 2 }, skuReference: 'P', quantity: 1 }, actorId: 'A', type: 'RECEIVE', warehouseId: 'WH' });
+  const changed = stockRequestFingerprint({ warehouseId: 'WH', type: 'RECEIVE', actorId: 'A', dto: { quantity: 2, skuReference: 'P', metadata: { b: 2, a: 1 } } });
+  assert.equal(first, reordered);
+  assert.notEqual(first, changed);
 });

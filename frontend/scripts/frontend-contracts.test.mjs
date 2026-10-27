@@ -65,14 +65,16 @@ test('API resource keeps the last successful data when refresh fails', () => {
   assert.match(catchBlock, /setStatus\('error'\)/);
 });
 
-test('RF offline queue uses IndexedDB with a bounded local fallback', () => {
+test('RF offline queue confirms writes and preserves every unacknowledged scan', () => {
   const queue = read('src/core/scanning/rfOfflineQueue.ts');
   const page = read('src/features/rf/RfPage.tsx');
   assert.match(queue, /indexedDB\.open/);
   assert.match(queue, /createObjectStore/);
-  assert.match(queue, /slice\(0, 500\)/);
-  assert.match(page, /loadRfOfflineQueue/);
-  assert.match(page, /saveRfOfflineQueue/);
+  assert.doesNotMatch(queue, /slice\(0, 500\)/);
+  assert.match(queue, /appendRfOfflineScan/);
+  assert.match(queue, /removeRfOfflineScans/);
+  assert.match(page, /await appendRfOfflineScan/);
+  assert.match(page, /await removeRfOfflineScans/);
   assert.doesNotMatch(page, /wms-rf-offline-queue-v2/);
 });
 
